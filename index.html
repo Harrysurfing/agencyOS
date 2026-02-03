@@ -892,14 +892,17 @@
         </div>
       `;
 
-      const qa = agent.qa || {};
       const qaQualities = ['专注', '共情', '气场', '欺瞒', '主动', '专业', '活力', '坚毅', '诡秘'];
-      const qaHtml = qaQualities.map(q => `
+      const qa = agent.qa || {};
+      const qaHtml = qaQualities.map(q => {
+        const val = qa[q] != null ? Number(qa[q]) : 0;
+        return `
         <div class="qa-item">
           <span>${q}</span>
-          <span class="value">${qa[q] ?? 0}</span>
+          <span class="value">${val}</span>
         </div>
-      `).join('');
+      `;
+      }).join('');
 
       const itemsHtml = (agent.申领物 || []).map(item => `
         <div class="item-card">
