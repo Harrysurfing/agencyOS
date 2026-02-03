@@ -820,6 +820,10 @@
             <span class="value" id="looseEnds">—</span>
           </div>
           <div class="agency-stat">
+            <span class="label">现实稳定度</span>
+            <span class="value" id="realityStability">—</span>
+          </div>
+          <div class="agency-stat">
             <span class="label">分部名</span>
             <span class="value">悉尼</span>
           </div>
@@ -973,6 +977,13 @@
         const data = await fetchJSON('statuses.json');
         document.getElementById('chaosValue').textContent = data.agency?.混沌值 ?? '—';
         document.getElementById('looseEnds').textContent = data.agency?.散逸端 ?? '—';
+
+        function updateRealityStability() {
+          const pct = Math.floor(Math.random() * 21) + 75;
+          document.getElementById('realityStability').textContent = pct + '%';
+        }
+        updateRealityStability();
+        setInterval(updateRealityStability, 1000);
 
         const newsEl = document.getElementById('agencyNews');
         const newsArr = data.agency?.news;
