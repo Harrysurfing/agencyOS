@@ -908,7 +908,7 @@
 
       const profilePicSrc = agent.profilePic || (agent.id ? `assets/${agent.id}.png` : null);
       const profilePicHtml = profilePicSrc
-        ? `<div class="agent-profile-slot"><img class="agent-profile-pic" src="${escapeHtml(profilePicSrc)}" alt="${escapeHtml(agent.name || '')}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" /><div class="agent-profile-placeholder" style="display:none;">头像</div></div>`
+        ? `<div class="agent-profile-slot"><img class="agent-profile-pic" src="${escapeHtml(profilePicSrc)}" alt="${escapeHtml(agent.name || '')}" onerror="if(!this.dataset.retried){this.dataset.retried=1;this.src=this.src.replace(/\\.png$/i,'.PNG');}else{this.style.display='none';this.nextElementSibling.style.display='flex';}" /><div class="agent-profile-placeholder" style="display:none;">头像</div></div>`
         : `<div class="agent-profile-slot"><div class="agent-profile-placeholder">头像</div></div>`;
 
       return `
