@@ -94,7 +94,7 @@
       flex-wrap: wrap;
       gap: 0.75rem;
       position: relative;
-      overflow: hidden;
+      z-index: 100;
     }
 
     .banner-ecg {
@@ -177,14 +177,18 @@
       text-shadow: 0 0 10px var(--glow-red-soft), 0 0 20px var(--glow-red-soft);
     }
 
-    .search-bar {
+    .agent-dropdown-wrap {
+      position: relative;
       flex: 1;
-      max-width: 400px;
-      min-width: 200px;
+      max-width: 280px;
+      z-index: 101;
     }
 
-    .search-bar input {
+    .agent-dropdown-trigger {
       width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
       padding: 0.6rem 1rem;
       background: var(--bg-dark);
       border: 1px solid var(--border);
@@ -192,17 +196,71 @@
       color: var(--text-primary);
       font-family: inherit;
       font-size: 0.95rem;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+      transition: border-color 0.2s;
     }
 
-    .search-bar input::placeholder {
-      color: var(--text-secondary);
-    }
-
-    .search-bar input:focus {
-      outline: none;
+    .agent-dropdown-trigger:hover {
       border-color: var(--accent-red);
-      box-shadow: 0 0 12px var(--glow-red-soft);
+    }
+
+    .agent-count {
+      color: var(--accent-red);
+      font-weight: 600;
+    }
+
+    .dropdown-arrow {
+      margin-left: auto;
+      font-size: 0.7rem;
+      opacity: 0.8;
+    }
+
+    .agent-dropdown-panel {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      margin-top: 0.25rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.75rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      z-index: 1000;
+      max-height: 240px;
+      overflow-y: auto;
+    }
+
+    .agent-dropdown-panel.open {
+      display: block;
+    }
+
+    .agent-checkboxes {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .agent-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      font-size: 0.9rem;
+      padding: 0.25rem 0;
+    }
+
+    .agent-checkbox:hover {
+      color: var(--accent-red);
+    }
+
+    .agent-checkbox input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent-red);
+      cursor: pointer;
+      flex-shrink: 0;
     }
 
     /* Main layout: left sidebar + content */
@@ -1019,6 +1077,46 @@
       animation: neon-pulse 4s ease-in-out infinite;
     }
 
+    .agent-tabs {
+      display: none;
+    }
+
+    .agent-tab {
+      padding: 0.5rem 1rem;
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      border-bottom: none;
+      border-radius: 6px 6px 0 0;
+      color: var(--text-secondary);
+      font-family: inherit;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .agent-tab:hover {
+      color: var(--text-primary);
+    }
+
+    .agent-tab.active {
+      background: var(--bg-card);
+      color: var(--accent-red);
+      border-color: var(--accent-red);
+      font-weight: 600;
+    }
+
+    .agent-tab-panels {
+      display: contents;
+    }
+
+    .agent-tab-panel {
+      display: contents;
+    }
+
+    .agent-tab-panel.hidden {
+      display: none;
+    }
+
     @media (max-width: 768px) {
       .layout {
         flex-direction: column;
@@ -1038,8 +1136,38 @@
         min-width: 140px;
       }
 
+      .sidebar {
+        display: none;
+      }
+
       .banner-ecg {
         display: none;
+      }
+
+      .agent-tabs {
+        display: flex;
+        gap: 0.25rem;
+        padding: 0.5rem 1rem 0;
+        background: var(--bg-card);
+        border-bottom: 1px solid var(--border);
+        overflow-x: auto;
+      }
+
+      .main-content {
+        flex: 1;
+        overflow: auto;
+      }
+
+      .agents-grid {
+        display: block;
+      }
+
+      .agents-grid .agent-card {
+        display: none;
+      }
+
+      .agents-grid .agent-card.mobile-visible {
+        display: block;
       }
     }
 
@@ -1092,14 +1220,19 @@
       <h1>AgencyOS</h1>
     </div>
     <div class="banner-ecg" aria-hidden="true"></div>
-    <div class="search-bar">
-      <input type="text" id="searchInput" placeholder="按特工名称或代号搜索…" />
+    <div class="agent-dropdown-wrap">
+      <button class="agent-dropdown-trigger" id="agentDropdownTrigger">
+        <span>选择特工</span>
+        <span class="agent-count" id="agentCount">全部</span>
+        <span class="dropdown-arrow">▼</span>
+      </button>
+      <div class="agent-dropdown-panel" id="agentDropdownPanel"></div>
     </div>
   </header>
 
   <div class="layout">
     <aside class="sidebar">
-      <div class="sidebar-section">
+      <div class="sidebar-section agency-stats-section">
         <div class="sidebar-title">机构状态</div>
         <div class="agency-stats">
           <div class="agency-stat">
@@ -1120,7 +1253,7 @@
           </div>
         </div>
       </div>
-      <div class="sidebar-section">
+      <div class="sidebar-section gm-profile-section">
         <div class="sidebar-title">机构总经理</div>
         <div class="gm-profile">
           <div class="gm-profile-frame">
@@ -1136,7 +1269,7 @@
           </div>
         </div>
       </div>
-      <div class="sidebar-section agency-news">
+      <div class="sidebar-section agency-news agency-news-section">
         <div class="sidebar-title">机构动态</div>
         <div class="agency-news-content" id="agencyNews">
           <span class="agency-news-placeholder">暂无动态</span>
@@ -1161,6 +1294,8 @@
     }
 
     let allAgents = [];
+    let selectedAgentIndices = new Set();
+    const MAX_SELECTED_AGENTS = 3;
 
     const AGENCY_RATINGS = [
       '评级良好',
@@ -1364,22 +1499,105 @@
       return div.innerHTML;
     }
 
-    function filterAgents(query) {
-      const q = (query || '').trim().toLowerCase();
-      if (!q) return allAgents;
-      return allAgents.filter(a =>
-        (a.name || '').toLowerCase().includes(q) ||
-        (a.aka || '').toLowerCase().includes(q)
-      );
+    function renderAgentSelect() {
+      const panel = document.getElementById('agentDropdownPanel');
+      const trigger = document.getElementById('agentDropdownTrigger');
+      const countEl = document.getElementById('agentCount');
+
+      panel.innerHTML = `<div class="agent-checkboxes">${allAgents.map((a, i) => `
+        <label class="agent-checkbox">
+          <input type="checkbox" data-index="${i}" ${selectedAgentIndices.has(i) ? 'checked' : ''} ${!selectedAgentIndices.has(i) && selectedAgentIndices.size >= MAX_SELECTED_AGENTS ? 'disabled' : ''} />
+          <span>${escapeHtml(a.name || '未命名')}${a.aka ? ` (${escapeHtml(a.aka)})` : ''}</span>
+        </label>
+      `).join('')}</div>`;
+
+      panel.querySelectorAll('.agent-checkbox input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener('change', (e) => {
+          e.stopPropagation();
+          const i = parseInt(cb.dataset.index);
+          if (cb.checked) {
+            if (selectedAgentIndices.size < MAX_SELECTED_AGENTS) {
+              selectedAgentIndices.add(i);
+            }
+          } else {
+            selectedAgentIndices.delete(i);
+          }
+          updateAgentCount();
+          renderAgentSelect();
+          renderContent();
+        });
+      });
+
+      trigger.onclick = (e) => {
+        e.stopPropagation();
+        panel.classList.toggle('open');
+      };
+
+      if (!trigger._dropdownBound) {
+        trigger._dropdownBound = true;
+        document.addEventListener('click', (e) => {
+          const wrap = document.querySelector('.agent-dropdown-wrap');
+          if (wrap && !wrap.contains(e.target)) {
+            panel.classList.remove('open');
+          }
+        });
+      }
+
+      function updateAgentCount() {
+        const n = selectedAgentIndices.size;
+        countEl.textContent = n > 0 ? `(${n})` : '全部';
+      }
+      updateAgentCount();
     }
 
-    function renderContent(agents) {
+    function renderContent() {
       const content = document.getElementById('content');
+      const hasSelection = selectedAgentIndices.size > 0;
+      const indices = hasSelection ? [...selectedAgentIndices].sort((a, b) => a - b) : allAgents.map((_, i) => i);
+      const agents = indices.map(i => allAgents[i]).filter(Boolean);
+
       if (agents.length === 0) {
-        content.innerHTML = '<div class="no-results">未找到匹配的特工</div>';
+        content.innerHTML = '<div class="no-results">暂无特工数据</div>';
         return;
       }
-      content.innerHTML = `<div class="agents-grid">${agents.map(renderAgent).join('')}</div>`;
+
+      const showTabs = hasSelection && window.matchMedia('(max-width: 768px)').matches;
+      const tabsHtml = showTabs ? indices.map((idx, tabIdx) => {
+        const a = allAgents[idx];
+        const label = a.aka || a.name || '未命名';
+        return `<button type="button" class="agent-tab ${tabIdx === 0 ? 'active' : ''}" data-tab-index="${tabIdx}" data-agent-index="${idx}">${escapeHtml(label)}</button>`;
+      }).join('') : '';
+
+      const cardsHtml = agents.map((agent, i) => {
+        const card = renderAgent(agent);
+        return card.replace('<div class="agent-card">', `<div class="agent-card" data-agent-index="${indices[i]}" data-tab-index="${i}">`);
+      }).join('');
+
+      content.innerHTML = `
+        <div class="agent-tabs">${tabsHtml}</div>
+        <div class="agents-grid">${cardsHtml}</div>
+      `;
+
+      if (showTabs) {
+        content.querySelectorAll('.agent-tab').forEach(tab => {
+          tab.addEventListener('click', () => {
+            const tabIndex = parseInt(tab.dataset.tabIndex);
+            content.querySelectorAll('.agent-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            content.querySelectorAll('.agents-grid .agent-card').forEach(card => {
+              const cardTabIdx = parseInt(card.dataset.tabIndex);
+              card.classList.toggle('mobile-visible', cardTabIdx === tabIndex);
+            });
+          });
+        });
+        content.querySelectorAll('.agents-grid .agent-card').forEach((card, i) => {
+          card.classList.toggle('mobile-visible', i === 0);
+        });
+      } else if (window.matchMedia('(max-width: 768px)').matches && !hasSelection) {
+        content.querySelectorAll('.agents-grid .agent-card').forEach(card => {
+          card.classList.add('mobile-visible');
+        });
+      }
     }
 
     async function load() {
@@ -1411,18 +1629,12 @@
         }
 
         allAgents = data.agents || [];
-        const query = document.getElementById('searchInput').value;
-        const filtered = filterAgents(query);
-        renderContent(filtered);
+        renderAgentSelect();
+        renderContent();
       } catch (err) {
         content.innerHTML = `<div class="error">${escapeHtml(err.message)}</div>`;
       }
     }
-
-    document.getElementById('searchInput').addEventListener('input', () => {
-      const filtered = filterAgents(document.getElementById('searchInput').value);
-      renderContent(filtered);
-    });
 
     load();
   </script>
