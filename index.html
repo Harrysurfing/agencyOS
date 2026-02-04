@@ -1177,7 +1177,7 @@
 
     function getAgencyRating(申诫) {
       const n = Math.max(0, parseInt(申诫, 10) || 0);
-      return n >= 10 ? '冷冻酸奶室权限已撤销' : (AGENCY_RATINGS[n] ?? '—');
+      return n >= 10 ? '冷冻酸奶室权限已撤销🚫' : (AGENCY_RATINGS[n] ?? '—');
     }
 
     function getAgencyRatingTier(申诫) {
