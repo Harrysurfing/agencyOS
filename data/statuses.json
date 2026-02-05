@@ -78,7 +78,35 @@
         "现实": {
           "choice": "明星",
           "割裂进度": 0,
-          "关系": [],
+          "关系": [
+            {
+              "name": "扎心伯格",
+              "actor": "小白",
+              "description": "刚进公司的贵人",
+              "benefit": "",
+              "benefitDescription": "",
+              "benefitActive": false,
+              "closeness": 3
+            },
+            {
+              "name": "斯派克",
+              "actor": "哈里",
+              "description": "经纪人",
+              "benefit": "",
+              "benefitDescription": "",
+              "benefitActive": false,
+              "closeness": 3
+            },
+            {
+              "name": "爱迪生瓦罗内",
+              "actor": "弗兰克",
+              "description": "互相仿效和较劲的兄弟",
+              "benefit": "",
+              "benefitDescription": "",
+              "benefitActive": false,
+              "closeness": 6
+            }
+          ],
           "现实触发器": {
             "name": "你的头号粉丝",
             "description": "你的粉丝无处不在，而且他们都想找机会和你说话。GM可使用现实触发器，让某人认出你，并拼命想引起你的注意。如果你不理他们，他们现在就会大吵大闹，之后还会在网上抱怨：你名声扫地，损失最大的那段人际关系会失去一点连结。\n如果你做出有损声誉的事，你的名声便会开始消退。在一条四格的\"陨落\"条上标记下一个空格。当\"陨落\"条被填满时，或当你放弃自己的目标时，你的明星之路便告终结：你必须选择一个新的现实。"
@@ -157,7 +185,7 @@
           "关系": [
             {
               "name": "爱丽丝",
-              "actor": "劳伦斯",
+              "actor": "弗兰克",
               "description": "一个话唠的前同事，超爱分享她的故事",
               "benefit": "",
               "benefitDescription": "",
@@ -166,7 +194,7 @@
             },
             {
               "name": "Marcus",
-              "actor": "M",
+              "actor": "劳伦斯",
               "description": "互有好感。 城市空间设计的顾问。",
               "benefit": "",
               "benefitDescription": "",
@@ -175,7 +203,7 @@
             },
             {
               "name": "卢卡斯",
-              "actor": "",
+              "actor": "哈里",
               "description": "无感。 隔壁花店主理人，一天来3次咖啡厅",
               "benefit": "",
               "benefitDescription": "",
