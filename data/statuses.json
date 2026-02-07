@@ -1,54 +1,68 @@
 {
-  "agency": {
-    "混沌值": 0,
-    "散逸端": 0,
-    "news": [
-      {
-        "date": "2026-02-07",
-        "text": "特工 Axl (agent-01) 嘉奖已更新为 24。"
-      },
-      {
-        "date": "2026-02-07",
-        "text": "特工 Axl (agent-01) 档案已录入系统。"
-      }
-    ]
-  },
   "agents": [
     {
-      "id": "agent-01",
-      "name": "Uno",
-      "aka": "Axl",
-      "title": "外勤特工",
-      "qa": {
-        "共情": 1,
-        "主动": 3,
-        "坚持": 3,
-        "气质": 3,
-        "专业": 5,
-        "逻辑": 0,
-        "专注": 0,
-        "欺瞒": 0,
-        "活力": 0,
-        "诡秘": 0
+      "id": "agent-axl",
+      "name": "Axl",
+      "pronouns": "He/Him",
+      "stats": {
+        "气场 (Presence)": 5,
+        "诡秘 (Underhand)": 3,
+        "活力 (Vigor)": 2,
+        "缜密 (Scrutiny)": 2,
+        "共情 (Empathy)": 1,
+        "坚持 (Steadfast)": 1,
+        "主动 (Proactive)": 1,
+        "专业 (Professional)": 1
       },
-      "嘉奖": 24,
-      "申诫": 0,
-      "mvp": 0,
-      "probation": false,
-      "flag": 0,
-      "socks": 0,
       "异常": {
-        "choice": "时计",
-        "abilities": []
+        "choice": "低语者 (Whisper)",
+        "abilities": [
+          {
+            "name": "再说一遍？",
+            "trigger": "对他人的口头陈述进行回复",
+            "stat": "气场 (Presence)",
+            "description": "向小组说明目标实际上想说的话。成功时，目标会相信那是他们原本想表达的。若掷出六个或更多“3”，可在一小时内替其发言。"
+          }
+        ],
+        "overload_trigger": "当有人打断我时",
+        "overload_responses": [
+          "先相信他们是出于好意 (T2)",
+          "直接表达我的不满 (P4)"
+        ]
       },
       "现实": {
-        "choice": "海王",
-        "closeness": 0,
-        "connections": []
+        "choice": "明星 (Star)",
+        "闪光点": "音乐人",
+        "现实触发器": {
+          "name": "你最狂热的粉丝",
+          "description": "到处都有粉丝想要吸引你的关注。如果你视而不见，他们会制造巨大的麻烦或令你难堪。"
+        },
+        "过载解除": {
+          "name": "退场时间",
+          "description": "当你避开所有视线并独处时，无视所有过载。"
+        },
+        "关系轨迹": {
+          "type": "陨落",
+          "slots": [false, false, false, false]
+        }
       },
       "职能": {
-        "choice": "前台",
-        "benefits": []
+        "choice": "前台接待 (Reception)",
+        "最高原则": {
+          "name": "时刻保持警惕",
+          "description": "选定项：每当你留下一个问题未回答时，受到 1 次违规处分。"
+        },
+        "授权行为": [
+          "审问某人",
+          "征用他人财物",
+          "彻底关闭一扇门"
+        ],
+        "嘉奖记录": 0,
+        "申诫记录": 0,
+        "初始补给": {
+          "item": "莫比乌斯回路电视 (Moebius Circuit TV)",
+          "description": "每次任务可使用一次。通过屏幕观察，你可以看到一个地点在过去、现在或可能的未来中的样子。"
+        }
       }
     }
   ]
