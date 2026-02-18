@@ -467,15 +467,15 @@
       "wallTracks": {
         "异常": {
           "marked": 0,
-          "struck": 0
+          "struck": 30
         },
         "现实": {
-          "marked": 0,
+          "marked": 30,
           "struck": 0
         },
         "职能": {
-          "marked": 0,
-          "struck": 0
+          "marked": 9,
+          "struck": 21
         }
       },
       "机构头衔": "执行副总裁"
