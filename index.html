@@ -2114,6 +2114,11 @@
       white-space: pre-line;
     }
 
+    .ref-item-desc .outcome-label {
+      color: var(--accent-red);
+      font-weight: 600;
+    }
+
     .ref-block>.ref-item-desc {
       margin: 0.35rem 0.75rem 0.75rem;
     }
@@ -2625,7 +2630,7 @@
               ${ab.熟练 ? '<span class="ability-proficient">(熟练)</span>' : ''}
             </span>
           </summary>
-          <div class="ref-item-desc">${escapeHtml(ab.description || '')}</div>
+          <div class="ref-item-desc">${formatDescriptionWithOutcomes(ab.description || '')}</div>
         </details>
       `).join('');
     }
@@ -2703,13 +2708,13 @@
       if (arc.现实触发器) {
         html += `<details class="ref-item">
           <summary>${escapeHtml(arc.现实触发器.name || '')}</summary>
-          <div class="ref-item-desc">${escapeHtml(arc.现实触发器.description || '')}</div>
+          <div class="ref-item-desc">${formatDescriptionWithOutcomes(arc.现实触发器.description || '')}</div>
         </details>`;
       }
       if (arc.过载解除) {
         html += `<details class="ref-item">
           <summary>${escapeHtml(arc.过载解除.name || '')}</summary>
-          <div class="ref-item-desc">${escapeHtml(arc.过载解除.description || '')}</div>
+          <div class="ref-item-desc">${formatDescriptionWithOutcomes(arc.过载解除.description || '')}</div>
         </details>`;
       }
       html += `<details class="ref-item">
@@ -2754,7 +2759,7 @@
       if (arc.首要指令) {
         html += `<details class="ref-item">
           <summary>${escapeHtml(arc.首要指令.name || '')}</summary>
-          <div class="ref-item-desc">${escapeHtml(arc.首要指令.description || '')}</div>
+          <div class="ref-item-desc">${formatDescriptionWithOutcomes(arc.首要指令.description || '')}</div>
         </details>`;
       }
       if (arc.许可行为 && arc.许可行为.length) {
@@ -2887,6 +2892,14 @@
       const div = document.createElement('div');
       div.textContent = str;
       return div.innerHTML;
+    }
+
+    function formatDescriptionWithOutcomes(str) {
+      if (!str) return '';
+      const escaped = escapeHtml(str);
+      return escaped
+        .replace(/成功时/g, '<span class="outcome-label">成功时</span>')
+        .replace(/失败时/g, '<span class="outcome-label">失败时</span>');
     }
 
     function renderAgentSelect() {
