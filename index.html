@@ -1607,6 +1607,8 @@
       font-size: 0.85rem;
       color: var(--text-secondary);
       margin-top: 0.15rem;
+      min-height: 2.6em;
+      line-height: 1.35;
     }
 
     .agent-agency-rating .label {
@@ -1703,16 +1705,12 @@
     }
 
     .agent-scores {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem 1rem;
+      display: grid;
+      grid-template-columns: auto auto;
+      grid-template-rows: auto auto;
+      grid-auto-flow: column;
+      gap: 0.25rem 1rem;
       margin-top: 0.5rem;
-    }
-
-    .score-group {
-      display: inline-flex;
-      flex-wrap: nowrap;
-      gap: 1rem;
       align-items: center;
     }
 
@@ -1721,6 +1719,13 @@
       align-items: center;
       gap: 0.3rem;
       font-size: 0.85rem;
+      white-space: nowrap;
+    }
+
+    .score strong {
+      min-width: 1.5em;
+      text-align: left;
+      font-variant-numeric: tabular-nums;
     }
 
     .score-icon {
@@ -2329,8 +2334,6 @@
       .main-content {
         flex: 1;
         overflow: auto;
-        overflow-x: hidden;
-        -webkit-overflow-scrolling: touch;
       }
 
       .agents-grid {
@@ -2344,21 +2347,9 @@
       .agents-grid .agent-card-flip.mobile-visible {
         display: block;
       }
-      .agents-grid .agent-card-flip:not(.mobile-visible) {
-        content-visibility: auto;
-        contain-intrinsic-size: auto 400px;
-      }
 
       .agent-card {
         overflow: visible;
-        contain: layout style;
-      }
-      .agent-card-flip {
-        contain: layout style;
-      }
-      .agent-card,
-      .agent-card-back {
-        box-shadow: 0 0 12px var(--glow-red-soft);
       }
       .agent-card-inner {
         overflow: visible;
@@ -2417,7 +2408,7 @@
       }
 
       .agents-grid {
-        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
       }
     }
 
@@ -2437,7 +2428,7 @@
       }
 
       .agents-grid {
-        grid-template-columns: repeat(auto-fill, minmax(460px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
       }
     }
   </style>
@@ -2605,7 +2596,6 @@
     let allAgents = [];
     let selectedAgentIndices = new Set();
     const MAX_SELECTED_AGENTS = 3;
-    const mediaMobile = window.matchMedia('(max-width: 768px)');
 
     const AGENCY_RATINGS = [
       '评级良好',
@@ -2802,14 +2792,10 @@
 
       const scoresHtml = `
         <div class="agent-scores">
-          <div class="score-group">
-            <div class="score 嘉奖"><span class="score-icon">★</span>嘉奖 <strong>${agent.嘉奖 ?? 0}</strong></div>
-            <div class="score 申诫"><span class="score-icon">✗</span>申诫 <strong>${agent.申诫 ?? 0}</strong></div>
-          </div>
-          <div class="score-group">
-            <div class="score 察看期"><span class="score-icon">▣</span>察看期 <strong>${agent.察看期 ?? 0}</strong></div>
-            <div class="score mvp"><span class="score-icon">◆</span>MVP <strong>${agent.mvp ?? agent.任务MVP ?? 0}</strong></div>
-          </div>
+          <div class="score 嘉奖"><span class="score-icon">★</span>嘉奖 <strong>${agent.嘉奖 ?? 0}</strong></div>
+          <div class="score 察看期"><span class="score-icon">▣</span>察看期 <strong>${agent.察看期 ?? 0}</strong></div>
+          <div class="score 申诫"><span class="score-icon">✗</span>申诫 <strong>${agent.申诫 ?? 0}</strong></div>
+          <div class="score mvp"><span class="score-icon">◆</span>MVP <strong>${agent.mvp ?? agent.任务MVP ?? 0}</strong></div>
         </div>
       `;
 
@@ -2836,7 +2822,7 @@
 
       const profilePicSrc = agent.profilePic || (agent.id ? `assets/${agent.id}.PNG` : null);
       const profilePicHtml = profilePicSrc
-        ? `<div class="agent-profile-slot"><img class="agent-profile-pic" loading="lazy" decoding="async" src="${escapeHtml(profilePicSrc)}" alt="${escapeHtml(agent.name || '')}" onerror="if(!this.dataset.retried){this.dataset.retried=1;this.src=this.src.replace(/\\.PNG$/i,'.png');}else{this.style.display='none';this.nextElementSibling.style.display='flex';}" /><div class="agent-profile-placeholder" style="display:none;">头像</div></div>`
+        ? `<div class="agent-profile-slot"><img class="agent-profile-pic" src="${escapeHtml(profilePicSrc)}" alt="${escapeHtml(agent.name || '')}" onerror="if(!this.dataset.retried){this.dataset.retried=1;this.src=this.src.replace(/\\.PNG$/i,'.png');}else{this.style.display='none';this.nextElementSibling.style.display='flex';}" /><div class="agent-profile-placeholder" style="display:none;">头像</div></div>`
         : `<div class="agent-profile-slot"><div class="agent-profile-placeholder">头像</div></div>`;
 
       const badgesHtml = [];
@@ -2979,7 +2965,7 @@
         return;
       }
 
-      const showTabs = hasSelection && mediaMobile.matches;
+      const showTabs = hasSelection && window.matchMedia('(max-width: 768px)').matches;
       const tabsHtml = showTabs ? agentIndexPairs.map((p, tabIdx) => {
         const label = p.agent.aka || p.agent.name || '未命名';
         return `<button type="button" class="agent-tab ${tabIdx === 0 ? 'active' : ''}" data-tab-index="${tabIdx}" data-agent-index="${p.index}">${escapeHtml(label)}</button>`;
@@ -3010,7 +2996,7 @@
         content.querySelectorAll('.agents-grid .agent-card-flip').forEach((card, i) => {
           card.classList.toggle('mobile-visible', i === 0);
         });
-      } else if (mediaMobile.matches && !hasSelection) {
+      } else if (window.matchMedia('(max-width: 768px)').matches && !hasSelection) {
         content.querySelectorAll('.agents-grid .agent-card-flip').forEach(card => {
           card.classList.add('mobile-visible');
         });
@@ -3019,7 +3005,7 @@
 
     async function load() {
       const content = document.getElementById('content');
-      const isMobile = mediaMobile.matches;
+      const isMobile = window.matchMedia('(max-width: 768px)').matches;
       try {
         const data = await fetchJSON('statuses.json');
 
