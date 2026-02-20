@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GM Editor — 特工状态编辑</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <header class="banner">
+    <div class="banner-title">
+      <div class="banner-triangle"></div>
+      <h1>GM Editor</h1>
+    </div>
+    <div class="agent-dropdown-wrap">
+      <button class="agent-dropdown-trigger" id="agentDropdownTrigger">
+        <span>选择特工</span>
+        <span class="agent-count" id="agentCount">0</span>
+        <span class="dropdown-arrow">▼</span>
+      </button>
+      <div class="agent-dropdown-panel" id="agentDropdownPanel"></div>
+    </div>
+    <a href="/missions.html" class="ref-btn" style="text-decoration:none;color:inherit;">任务笔记</a>
+    <button class="ref-btn" id="chaosEffectBtn">混沌效应</button>
+    <button class="ref-btn" id="secondaryAnomalyBtn">次级异常</button>
+    <button class="new-agent-btn" id="newMissionBtn">新建任务报告</button>
+    <button class="new-agent-btn" id="newAgentBtn">新建特工</button>
+    <button class="new-item-btn" id="newItemBtn">新建申领物</button>
+    <button class="save-btn" id="saveBtn">保存</button>
+  </header>
+
+  <main class="main">
+    <section class="agent-cards-section">
+      <div class="agent-cards" id="agentCards"></div>
+    </section>
+    <aside class="agency-sidebar">
+      <section class="agency-section">
+        <h2 class="section-title">机构状态</h2>
+        <div class="agency-fields">
+          <div class="field">
+            <label>混沌值</label>
+            <input type="number" id="chaosValue" min="0" />
+          </div>
+          <div class="field">
+            <label>散逸端</label>
+            <input type="number" id="looseEnds" min="0" />
+          </div>
+        </div>
+      </section>
+      <section class="news-section">
+        <h2 class="section-title">机构动态</h2>
+        <div class="news-add">
+          <input type="text" id="newsText" placeholder="输入动态内容…" />
+          <button class="add-btn" id="addNewsBtn">添加</button>
+        </div>
+        <ul class="news-list" id="newsList"></ul>
+      </section>
+      <section class="inmail-section">
+        <h2 class="section-title">收件箱邮件</h2>
+        <p class="inmail-desc">特工打开 AgencyOS 时会看到「新邮件提醒」，点击可查看。</p>
+        <button type="button" class="ref-btn inmail-btn" id="inMailBtn">编辑邮件</button>
+      </section>
+    </aside>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <div class="modal-overlay" id="newAgentModalOverlay">
+    <div class="modal" id="newAgentModal">
+      <div class="modal-header">
+        <h3 class="modal-title">新建特工</h3>
+        <button class="modal-close" type="button" aria-label="关闭">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-field">
+          <label>姓名</label>
+          <input type="text" id="newAgentName" placeholder="输入姓名" />
+        </div>
+        <div class="form-field">
+          <label>呼号 (AKA)</label>
+          <input type="text" id="newAgentAka" placeholder="输入呼号（可选）" />
+        </div>
+        <div class="form-field">
+          <label>异常</label>
+          <select id="newAgentAnomaly"></select>
+        </div>
+        <div class="form-field">
+          <label>现实</label>
+          <select id="newAgentReality"></select>
+        </div>
+        <div class="form-field">
+          <label>职能</label>
+          <select id="newAgentCompetency"></select>
+        </div>
+        <button class="modal-submit-btn" id="newAgentSubmit">创建</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="switchRealityModalOverlay">
+    <div class="modal" id="switchRealityModal">
+      <div class="modal-header">
+        <h3 class="modal-title">切换现实</h3>
+        <button class="modal-close" type="button" aria-label="关闭">×</button>
+      </div>
+      <div class="modal-body" id="switchRealityList"></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="itemsModalOverlay">
+    <div class="modal" id="itemsModal">
+      <div class="modal-header">
+        <h3 class="modal-title">添加申领物</h3>
+        <button class="modal-close" type="button" aria-label="关闭">×</button>
+      </div>
+      <div class="modal-search">
+        <input type="text" id="itemsModalSearch" placeholder="按名称搜索…" />
+      </div>
+      <div class="modal-body" id="itemsModalList"></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="newItemModalOverlay">
+    <div class="modal" id="newItemModal">
+      <div class="modal-header">
+        <h3 class="modal-title">新建申领物</h3>
+        <button class="modal-close" type="button" aria-label="关闭">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-field">
+          <label>名称</label>
+          <input type="text" id="newItemName" placeholder="输入申领物名称" />
+        </div>
+        <div class="form-field">
+          <label>嘉奖 (价格)</label>
+          <input type="number" id="newItemPrice" placeholder="0" min="0" />
+        </div>
+        <div class="form-field">
+          <label>描述</label>
+          <textarea id="newItemDesc" placeholder="输入申领物描述" rows="6"></textarea>
+        </div>
+        <button class="modal-submit-btn" id="newItemSubmit">创建</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="changeAbilityModalOverlay">
+    <div class="modal" id="changeAbilityModal">
+      <div class="modal-header">
+        <h3 class="modal-title">变化 — 更换能力</h3>
+        <button class="modal-close" type="button" aria-label="关闭">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-field">
+          <label>能力名称</label>
+          <input type="text" id="changeAbilityName" placeholder="输入新能力名称" />
+        </div>
+        <div class="form-field">
+          <label>能力描述</label>
+          <textarea id="changeAbilityDesc" placeholder="输入新能力描述" rows="8"></textarea>
+        </div>
+        <button class="modal-submit-btn" id="changeAbilitySubmit">确认更换</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="addAbilityModalOverlay">
+    <div class="modal" id="addAbilityModal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="addAbilityModalTitle">添加异常能力</h3>
+        <button class="modal-close" type="button" aria-label="关闭">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-field">
+          <label>能力名称</label>
+          <input type="text" id="addAbilityName" placeholder="输入能力名称" />
+        </div>
+        <div class="form-field">
+          <label>能力描述</label>
+          <textarea id="addAbilityDesc" placeholder="输入能力描述" rows="6"></textarea>
+        </div>
+        <div class="form-field">
+          <label><input type="checkbox" id="addAbilityPracticable" /> 可练习</label>
+          <span class="form-hint">勾选后该能力将包含「已练习」与「为人所知」轨道</span>
+        </div>
+        <button class="modal-submit-btn" id="addAbilitySubmit">确认</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="newMissionModalOverlay">
+    <div class="modal ref-modal ref-modal-wide" id="newMissionModal">
+      <div class="modal-header">
+        <h3 class="modal-title">新建任务报告</h3>
+        <button class="modal-close" type="button" aria-label="关闭">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-field">
+          <label>异常状态</label>
+          <select id="missionStatus">
+            <option value="已中和">已中和</option>
+            <option value="已捕获">已捕获</option>
+            <option value="已逃脱">已逃脱</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label>代号</label>
+            <input type="text" id="missionCodename" placeholder="异常代号" />
+          </div>
+          <div class="form-field">
+            <label>行为</label>
+            <input type="text" id="missionBehavior" placeholder="异常行为" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label>焦点</label>
+            <input type="text" id="missionFocus" placeholder="异常焦点" />
+          </div>
+          <div class="form-field">
+            <label>领域</label>
+            <input type="text" id="missionDomain" placeholder="异常领域" />
+          </div>
+        </div>
+        <div class="form-field">
+          <label>参与者</label>
+          <textarea id="missionParticipants" placeholder="参与任务的特工" rows="2"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label>察看期</label>
+            <input type="text" id="missionObservation" placeholder="察看期" />
+          </div>
+          <div class="form-field">
+            <label>MVP</label>
+            <input type="text" id="missionMvp" placeholder="MVP" />
+          </div>
+          <div class="form-field">
+            <label>最终评级</label>
+            <input type="text" id="missionRating" placeholder="最终评级" />
+          </div>
+        </div>
+        <button class="modal-submit-btn" id="newMissionSubmit">创建</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="chaosEffectModalOverlay">
+    <div class="modal ref-modal ref-modal-wide" id="chaosEffectModal">
+      <div class="modal-header">
+        <h3 class="modal-title">混沌效应 — GM 参考</h3>
+        <button class="modal-close" type="button" aria-label="关闭">×</button>
+      </div>
+      <div class="modal-body">
+        <table class="ref-table">
+          <thead>
+            <tr>
+              <th>代价</th>
+              <th>效果</th>
+              <th>描述</th>
+              <th>示例</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="chaos-effect-row" data-cost="1" data-effect="扭曲"><td>1</td><td>扭曲</td><td>一个物体或地点以一种凡俗的方式被改变。</td><td>一扇门被锁上；一台摄像机开启；玫瑰变成了郁金香；你最喜欢的外套现在是绿色的了。</td></tr>
+            <tr class="chaos-effect-row" data-cost="2" data-effect="腐化"><td>2</td><td>腐化</td><td>一个物体或地点被改变以反映异常体，造成非自然的外观或危险的变化。</td><td>门后是深坑；摄像机的录像显示目标已死；玫瑰中绽放出眼睛；你最喜欢的外套现在是皮肤了。</td></tr>
+            <tr class="chaos-effect-row" data-cost="3" data-effect="现实触发器"><td>3</td><td>现实触发器</td><td>一名角色的"现实"特性被激活。</td><td>"程过载"接到一个电话；"明星"遇到一个粉丝；"看护者"的受照料者饿了。</td></tr>
+            <tr class="chaos-effect-row" data-cost="4" data-effect="显化"><td>4</td><td>显化</td><td>使用下方的"次级异常体创建图表"来创造一个新的次级异常体。</td><td>一个盗窃型异常体偷走了一张重要的门禁卡。</td></tr>
+            <tr class="chaos-effect-row" data-cost="5" data-effect="吸引"><td>5</td><td>吸引</td><td>几个凡俗存在（例如人际关系中的人）发现自己被吸引进了异常体的领域。</td><td>一辆巴士改变了路线；一名记者有了预感；警察放弃了他们的路障。</td></tr>
+            <tr class="chaos-effect-row" data-cost="6" data-effect="扩张"><td>6</td><td>扩张</td><td>异常体的领域扩张，将另一个地点纳入其力量范围。此变化的大小取决于异常体的焦点。</td><td>异常体将其影响范围从一间办公室扩展到整栋建筑；从一栋建筑扩展到一个街区；从一个街区扩展到整座城。</td></tr>
+            <tr class="chaos-effect-row" data-cost="7" data-effect="双重"><td>7</td><td>双重</td><td>使用"次级异常体创建图表"创造2个次级异常体。</td><td>一个诱惑型异常体分散了特工们的注意力，同时一个囚禁型异常体将一个重要的信息来源困在了无尽的迷宫中。</td></tr>
+            <tr class="chaos-effect-row" data-cost="9" data-effect="三重"><td>9</td><td>三重</td><td>使用"次级异常体创建图表"创造3个次级异常体。</td><td>三个扰乱型异常体藏在灯具中，产生足够的混沌来创造一波波暴力型异常体来追击特工。</td></tr>
+            <tr class="chaos-effect-row" data-cost="10" data-effect="杀死"><td>10</td><td>杀死</td><td>一条凡俗生命被终结，无论有何防御。此效果无法被任何其他效果停止、改变或中断。</td><td>心脏停止；心智破碎；灵魂碎裂；一辆巴士砸在某人身上。</td></tr>
+            <tr class="chaos-effect-row" data-cost="30" data-effect="压倒"><td>30</td><td>压倒</td><td>一条异常的生命被终结，无论有何防御。除非另有说明，此效果无法被任何效果停止、改变或中断。</td><td>即使是机构也无法永远保护你。但我们总能把你带回来！</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="chaosEffectConfirmModalOverlay">
+    <div class="modal" id="chaosEffectConfirmModal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="chaosEffectConfirmTitle">确认创建混沌效应</h3>
+        <button class="modal-close" type="button" aria-label="关闭">×</button>
+      </div>
+      <div class="modal-body">
+        <p class="chaos-effect-confirm-info" id="chaosEffectConfirmInfo"></p>
+        <div class="form-field">
+          <label>创建数量</label>
+          <input type="number" id="chaosEffectCount" min="1" value="1" />
+        </div>
+        <p class="chaos-effect-total" id="chaosEffectTotal"></p>
+        <div class="modal-actions">
+          <button class="modal-cancel-btn" id="chaosEffectConfirmCancel">取消</button>
+          <button class="modal-submit-btn" id="chaosEffectConfirmSubmit">确认</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="secondaryAnomalyModalOverlay">
+    <div class="modal ref-modal ref-modal-wide" id="secondaryAnomalyModal">
+      <div class="modal-header">
+        <h3 class="modal-title">次级异常 — GM 参考</h3>
+        <button class="modal-close" type="button" aria-label="关闭">×</button>
+      </div>
+      <div class="modal-body">
+        <table class="ref-table ref-table-secondary">
+          <thead>
+            <tr>
+              <th>类别</th>
+              <th>威胁</th>
+              <th>稳定性</th>
+              <th>描述</th>
+              <th>关键能力</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>暴力型</td>
+              <td>2</td>
+              <td>1</td>
+              <td>这些异常体总是栖身于物理物体中，并常利用它们来造成伤害。它们可能是一条会勒人的绳子、一块高速移动的石头、或是一把充满威胁的剪刀。若不设法保护自己，你肯定会受伤。要避免伤害，基本总得掷骰或使用能力，而且它们可不是闹着玩的。</td>
+              <td>它们有了动力，就能大量杀死凡俗之人。</td>
+            </tr>
+            <tr>
+              <td>诱惑型</td>
+              <td>0</td>
+              <td>2</td>
+              <td>这些异常体在视觉上或心理上都令人着迷。它们可能很迷人、会跳舞什么的，但也可能是一顿令人垂涎的餐点、一首优美的歌曲，或任何对称旋转的东西。它们能轻易聚集一群被催眠的非异常人类，如果运气好，还能迷惑特工。与暴力型次级异常体配合时尤其危险。</td>
+              <td>它们能自由地控制凡俗之人。附近特工的掷骰失败也可能导致特工被控制。</td>
+            </tr>
+            <tr>
+              <td>囚禁型</td>
+              <td>0</td>
+              <td>3</td>
+              <td>这些异常体通过改变现实或超现实的空间来困住目标。它们可能会直接让一个笼子活过来，藏在一副扑克牌里抓住任何碰到鬼牌的人，或者干脆变成一只巨大的野兽吞噬目标。要逃离一个囚禁型异常体，或救出被捕获的人，需要创造性地使用特工的能力。</td>
+              <td>即使没有掷骰失败，它们也能囚禁凡俗之人或特工，将他们置于真实的或想象的环境中。</td>
+            </tr>
+            <tr>
+              <td>盗窃型</td>
+              <td>1</td>
+              <td>2</td>
+              <td>这些异常体喜欢偷窃重要物品，而且几乎不可能在它们得手前抓住。它们偏爱人类联想到恶作剧的形态，例如精怪或浣熊。看好你的钥匙！</td>
+              <td>会自动从凡俗之人或特工处偷窃物品，且必须被抓获。它们通常只在你试图夺回东西时才会攻击。如果特工留心观察，被盗的物品可能会提供关于其异常体焦点的线索。</td>
+            </tr>
+            <tr>
+              <td>冒充型</td>
+              <td>1</td>
+              <td>2</td>
+              <td>这些异常体足够老练，能模仿凡俗之人。它们会呈现出特定人物的形态；通常没有足够的创造力来独创一格。</td>
+              <td>如果其异常行为没有暴露它们，它们能在被阻止前轻易地制造出许多散逸端。如果一个异常体特别聪明，它会利用它们作为通往凡俗世界的大使。</td>
+            </tr>
+            <tr>
+              <td>扰乱型</td>
+              <td>1</td>
+              <td>1</td>
+              <td>这些异常体会放大它们附近产生的混沌，如果没被发现并摧毁，它们很快就能"值回票价"。它们喜欢伪装成凡俗物品。通常，混沌的增加是它们在场唯一的线索。</td>
+              <td>附近每有此类异常体存在，每次产生混沌时，总量便会额外增加1点。共鸣者可通过物理接触将其辨识为异常的。那1点伤害会在它们被摧毁时激活：它们会爆炸。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="relationshipModalOverlay">
+    <div class="modal" id="relationshipModal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="relationshipModalTitle">添加关系</h3>
+        <button class="modal-close" type="button" aria-label="关闭">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-field">
+          <label>名称</label>
+          <input type="text" id="relName" placeholder="输入关系人名称" />
+        </div>
+        <div class="form-field">
+          <label>扮演</label>
+          <input type="text" id="relActor" placeholder="如：劳伦斯扮演" />
+        </div>
+        <div class="form-field">
+          <label>描述</label>
+          <textarea id="relDesc" placeholder="输入关系人描述" rows="3"></textarea>
+        </div>
+        <div class="form-field">
+          <label>连结加成</label>
+          <input type="text" id="relBenefit" placeholder="如：睿智" />
+        </div>
+        <div class="form-field">
+          <label>连结加成描述</label>
+          <textarea id="relBenefitDesc" placeholder="输入连结加成效果描述" rows="4"></textarea>
+        </div>
+        <div class="form-field">
+          <label>连结 (1-9)</label>
+          <input type="number" id="relCloseness" min="1" max="9" value="1" />
+        </div>
+        <div class="form-field">
+          <label><input type="checkbox" id="relBenefitActive" /> 已激活</label>
+        </div>
+        <button class="modal-submit-btn" id="relationshipSubmit">确认</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="inMailModalOverlay">
+    <div class="modal" id="inMailModal">
+      <div class="modal-header">
+        <h3 class="modal-title">收件箱邮件</h3>
+        <button class="modal-close" type="button" aria-label="关闭">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-field">
+          <label>标题</label>
+          <input type="text" id="inMailTitle" placeholder="邮件标题" />
+        </div>
+        <div class="form-field">
+          <label>内容</label>
+          <textarea id="inMailContent" placeholder="邮件内容" rows="8"></textarea>
+        </div>
+        <div class="inmail-actions">
+          <button type="button" class="modal-submit-btn" id="inMailSaveBtn">发送</button>
+          <button type="button" class="inmail-clear-btn" id="inMailClearBtn">清除邮件</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>

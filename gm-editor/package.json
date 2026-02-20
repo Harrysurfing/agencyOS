@@ -1,0 +1,9 @@
+{
+  "name": "gm-editor",
+  "version": "1.0.0",
+  "description": "GM editor for Triangle Agency statuses",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
