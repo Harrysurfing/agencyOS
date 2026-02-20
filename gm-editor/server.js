@@ -279,6 +279,26 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  if (pathname === '/api/missions' && req.method === 'PUT') {
+    try {
+      const body = await readBody(req);
+      const json = body && body.trim() ? JSON.parse(body) : { missions: [] };
+      if (typeof json !== 'object' || json === null || !Array.isArray(json.missions)) {
+        res.writeHead(400, { 'Content-Type': 'application/json', ...CORS });
+        res.end(JSON.stringify({ error: 'Body must be { missions: array }' }));
+        return;
+      }
+      await fs.mkdir(DATA_DIR, { recursive: true });
+      await fs.writeFile(MISSIONS_PATH, JSON.stringify({ missions: json.missions }, null, 2), 'utf-8');
+      res.writeHead(200, { 'Content-Type': 'application/json', ...CORS });
+      res.end(JSON.stringify({ ok: true }));
+    } catch (err) {
+      res.writeHead(500, { 'Content-Type': 'application/json', ...CORS });
+      res.end(JSON.stringify({ error: err.message }));
+    }
+    return;
+  }
+
   if (pathname === '/api/items' && req.method === 'POST') {
     try {
       const body = await readBody(req);
