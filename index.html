@@ -320,6 +320,17 @@
     .siphon-eye-icon {
       width: 1.25rem;
       height: 1.25rem;
+      transform-origin: center;
+      transform-box: fill-box;
+      animation: siphon-eye 6s ease-in-out infinite;
+    }
+    @keyframes siphon-eye {
+      0%, 1.5%, 3%, 98.5%, 100% { transform: scale(1) scaleY(1) rotate(0deg); }
+      2%, 99% { transform: scale(1) scaleY(0.1) rotate(0deg); }
+      20% { transform: scale(1.04) scaleY(1) rotate(-0.6deg); }
+      40% { transform: scale(1) scaleY(1) rotate(0deg); }
+      60% { transform: scale(1.04) scaleY(1) rotate(0.6deg); }
+      80% { transform: scale(1) scaleY(1) rotate(0deg); }
     }
 
     .modal-overlay {
