@@ -522,6 +522,88 @@
       font-size: 1rem;
     }
 
+    .playwall-modal {
+      max-width: 560px;
+    }
+
+    .playwall-label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.35rem;
+    }
+
+    .playwall-input {
+      width: 100%;
+      max-width: 240px;
+      padding: 0.5rem 0.6rem;
+      font-size: 0.9rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      margin-bottom: 0.75rem;
+    }
+
+    .playwall-confirm-btn {
+      display: block;
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+      background: var(--accent-red);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-bottom: 0.5rem;
+    }
+
+    .playwall-confirm-btn:hover {
+      filter: brightness(1.1);
+    }
+
+    .playwall-error {
+      font-size: 0.85rem;
+      color: var(--reprimand-color);
+      margin-top: 0.5rem;
+    }
+
+    .playwall-back-link {
+      font-size: 0.85rem;
+      color: var(--accent-red);
+      margin-bottom: 0.75rem;
+      display: inline-block;
+    }
+
+    .playwall-select {
+      width: 100%;
+      max-width: 320px;
+      padding: 0.5rem 0.6rem;
+      font-size: 0.9rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      margin-bottom: 0.75rem;
+    }
+
+    .playwall-doc-content {
+      margin-top: 0.75rem;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--bg-dark);
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: var(--text-primary);
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+
+    .playwall-empty {
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+
     .joint-assessment-modal .modal-title.joint-assessment-title {
       font-size: 0.9rem;
       color: var(--text-secondary);
@@ -2454,6 +2536,7 @@
         <button class="items-list-btn" id="agencyDiceBtn">机构骰子</button>
         <button class="items-list-btn" id="itemsListBtn">申领物列表</button>
         <button class="items-list-btn" id="missionArchiveBtn">任务档案库</button>
+        <button class="items-list-btn" id="playwallBtn">高墙文件</button>
       </div>
     </div>
   </header>
@@ -2515,6 +2598,31 @@
       </div>
       <div class="modal-body">
         <div class="ta-report" id="jointAssessmentReport"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="playwallModalOverlay">
+    <div class="modal playwall-modal" id="playwallModal">
+      <div class="modal-header">
+        <h3 class="modal-title">高墙文件</h3>
+        <button class="modal-close" type="button" aria-label="关闭">×</button>
+      </div>
+      <div class="modal-body" id="playwallModalBody">
+        <div id="playwallStep1">
+          <label for="playwallAgentId" class="playwall-label">特工 ID</label>
+          <input type="text" id="playwallAgentId" class="playwall-input" placeholder="例如 agent-1">
+          <button type="button" class="playwall-confirm-btn" id="playwallConfirmBtn">确认</button>
+          <p id="playwallError" class="playwall-error" style="display:none"></p>
+        </div>
+        <div id="playwallStep2" style="display:none">
+          <p><a href="#" id="playwallBackLink" class="playwall-back-link">重新输入特工 ID</a></p>
+          <label for="playwallDocSelect" class="playwall-label">选择文件</label>
+          <select id="playwallDocSelect" class="playwall-select">
+            <option value="">请选择文件</option>
+          </select>
+          <div id="playwallDocContent" class="playwall-doc-content"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -2586,6 +2694,25 @@
       现实: { 0: 'C4', 3: 'L11', 7: 'E2', 9: 'O4', 13: 'T6', 16: 'V2', 18: 'X3', 20: 'H5', 23: 'E3' },
       异常: { 0: 'H4', 1: 'H3', 4: 'U2', 6: 'X2', 10: 'N1', 12: 'Q2', 16: 'L10', 18: 'G8', 22: 'A7' }
     };
+
+    function getUnlockedPlaywallRefs(agent) {
+      const tracks = agent.wallTracks || {
+        职能: { marked: 0, struck: 0 },
+        现实: { marked: 0, struck: 0 },
+        异常: { marked: 0, struck: 0 }
+      };
+      const refs = new Set();
+      const trackNames = ['职能', '现实', '异常'];
+      for (const name of trackNames) {
+        const track = tracks[name] || { marked: 0, struck: 0 };
+        const marked = Math.max(0, parseInt(track.marked, 10) || 0);
+        const map = WALL_TRACK_REFS[name] || {};
+        for (let i = 0; i < marked; i++) {
+          if (map[i] != null) refs.add(map[i]);
+        }
+      }
+      return refs;
+    }
 
     async function fetchJSON(filename) {
       const res = await fetch(`${BASE}/${filename}`);
@@ -3341,12 +3468,99 @@
     });
     document.getElementById('jointAssessmentModal').querySelector('.modal-close').addEventListener('click', closeJointAssessmentModal);
 
+    let playwallUnlockedDocs = [];
+
+    function openPlaywallModal() {
+      document.getElementById('playwallModalOverlay').classList.add('open');
+      document.getElementById('playwallStep1').style.display = '';
+      document.getElementById('playwallStep2').style.display = 'none';
+      document.getElementById('playwallAgentId').value = '';
+      document.getElementById('playwallError').style.display = 'none';
+      document.getElementById('playwallError').textContent = '';
+      document.getElementById('playwallDocSelect').innerHTML = '<option value="">请选择文件</option>';
+      document.getElementById('playwallDocContent').innerHTML = '';
+      playwallUnlockedDocs = [];
+    }
+
+    function closePlaywallModal() {
+      document.getElementById('playwallModalOverlay').classList.remove('open');
+    }
+
+    document.getElementById('playwallBtn').addEventListener('click', openPlaywallModal);
+    document.getElementById('playwallModalOverlay').addEventListener('click', e => {
+      if (e.target.id === 'playwallModalOverlay') closePlaywallModal();
+    });
+    document.getElementById('playwallModal').querySelector('.modal-close').addEventListener('click', closePlaywallModal);
+
+    document.getElementById('playwallConfirmBtn').addEventListener('click', () => {
+      const input = document.getElementById('playwallAgentId').value.trim();
+      const errEl = document.getElementById('playwallError');
+      errEl.style.display = 'none';
+      errEl.textContent = '';
+      const agent = allAgents.find(a => a.id === input);
+      if (!agent) {
+        errEl.textContent = '未找到该特工 ID';
+        errEl.style.display = 'block';
+        return;
+      }
+      const unlockedRefs = getUnlockedPlaywallRefs(agent);
+      fetchJSON('playwall.json')
+        .then(data => {
+          const allDocs = data?.documents || [];
+          playwallUnlockedDocs = allDocs.filter(d => unlockedRefs.has(d.id));
+          document.getElementById('playwallStep1').style.display = 'none';
+          document.getElementById('playwallStep2').style.display = '';
+          const sel = document.getElementById('playwallDocSelect');
+          sel.innerHTML = '<option value="">请选择文件</option>' +
+            playwallUnlockedDocs.map((doc, i) => `<option value="${i}">${escapeHtml(doc.title || doc.id || '')}</option>`).join('');
+          document.getElementById('playwallDocContent').innerHTML = '';
+          if (playwallUnlockedDocs.length === 0) {
+            const refList = [...unlockedRefs].sort().join('、');
+            const msg = unlockedRefs.size === 0
+              ? '当前未解锁任何高墙文件'
+              : `已解锁以下文件编号（${refList}），但 data/playwall.json 中暂无对应文档，请添加 id 匹配的文档后即可在此选择查看。`;
+            document.getElementById('playwallDocContent').innerHTML = '<p class="playwall-empty">' + escapeHtml(msg) + '</p>';
+          }
+        })
+        .catch(() => {
+          errEl.textContent = '加载高墙文件列表失败';
+          errEl.style.display = 'block';
+        });
+    });
+
+    document.getElementById('playwallBackLink').addEventListener('click', e => {
+      e.preventDefault();
+      document.getElementById('playwallStep2').style.display = 'none';
+      document.getElementById('playwallStep1').style.display = '';
+      document.getElementById('playwallAgentId').value = '';
+      document.getElementById('playwallError').style.display = 'none';
+      document.getElementById('playwallError').textContent = '';
+    });
+
+    document.getElementById('playwallDocSelect').addEventListener('change', () => {
+      const sel = document.getElementById('playwallDocSelect');
+      const contentEl = document.getElementById('playwallDocContent');
+      const idx = sel.value;
+      if (idx === '' || !playwallUnlockedDocs.length) {
+        contentEl.innerHTML = '';
+        return;
+      }
+      const doc = playwallUnlockedDocs[parseInt(idx, 10)];
+      if (!doc) {
+        contentEl.innerHTML = '';
+        return;
+      }
+      const raw = doc.content != null ? doc.content : (doc.body != null ? doc.body : '');
+      contentEl.innerHTML = raw ? escapeHtml(raw).replace(/\n/g, '<br>') : '<p class="playwall-empty">无内容</p>';
+    });
+
     document.addEventListener('keydown', e => {
       if (e.key !== 'Escape') return;
       if (document.getElementById('missionArchiveModalOverlay').classList.contains('open')) closeMissionArchiveModal();
       else if (document.getElementById('itemsListModalOverlay').classList.contains('open')) closeItemsListModal();
       else if (document.getElementById('agencyDiceModalOverlay').classList.contains('open')) closeAgencyDiceModal();
       else if (document.getElementById('jointAssessmentModalOverlay').classList.contains('open')) closeJointAssessmentModal();
+      else if (document.getElementById('playwallModalOverlay').classList.contains('open')) closePlaywallModal();
     });
 
     load();
