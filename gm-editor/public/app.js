@@ -4,6 +4,17 @@ const API_BASE = (window.location.port === '3001' ? '' : 'http://localhost:3001'
 
 const AGENCY_TITLES = ['见习生', '专员', '高级专员', '助理总监', '总监', '地区总监', '副总裁', '高级副总裁', '执行副总裁', '主席'];
 
+/** 机构限制：散逸端阈值 → { 起始混沌, 天气事件, 分部限制 } */
+const AGENCY_LIMITS_TABLE = [
+  { threshold: 11, 起始混沌: 5, 天气事件: 1, 分部限制: '在看似正常的对话中，特工们的人际关系会自发地提醒他们机构的职责以及减少散逸端的重要性。' },
+  { threshold: 22, 起始混沌: 10, 天气事件: 2, 分部限制: '要获得三重升华的效果，特工必须发表一段简短的演说，重申他们致力于清除散逸端和稳定现实的决心。' },
+  { threshold: 33, 起始混沌: 15, 天气事件: 3, 分部限制: '在进行任何掷骰前，特工都必须（大声或以等效方式）数到3。' },
+  { threshold: 44, 起始混沌: 20, 天气事件: 4, 分部限制: '在散逸端数量降至44以下前，特工不再有资格获得MVP。' },
+  { threshold: 55, 起始混沌: 25, 天气事件: 5, 分部限制: '向特工们宣读以下内容："若散逸端数量达到66，所有特工的合同都将被终止。如果你们无法通过任务减少此数量，就必须额外加班：从所有工作/生活平衡条的末尾划掉一个格子，以自行清除6个散逸端。"' },
+  { threshold: 66, 起始混沌: '无', 天气事件: '无', 分部限制: '当前任务结束时，在役的外勤小队将被强制退休。他们必须从可用的退休选项中选择一个。如果没有，他们将被送往收容库。该管辖区的散逸端数量将减少11个，每有一名特工使用其职能提供的退休选项，便额外减少11个。' },
+  { threshold: 77, 起始混沌: '无', 天气事件: '无', 分部限制: '崩解即将开始。为避免此事，该分部的管辖区将被从存在中抹除。' }
+];
+
 let statuses = null;
 let arcReference = null;
 let itemsCatalog = null;
@@ -36,6 +47,7 @@ async function load() {
 
 function render() {
   renderAgency();
+  renderAgencyLimits();
   renderNews();
   renderAgentSelect();
   renderAgentCards();
@@ -46,7 +58,26 @@ function renderAgency() {
   const agency = statuses.agency || {};
   document.getElementById('chaosValue').value = agency.混沌值 ?? 0;
   document.getElementById('looseEnds').value = agency.散逸端 ?? 0;
-  }
+}
+
+function renderAgencyLimits() {
+  const el = document.getElementById('agencyLimitsContent');
+  if (!el) return;
+  const looseEnds = parseInt(document.getElementById('looseEnds')?.value, 10) || 0;
+  const rows = AGENCY_LIMITS_TABLE.filter(r => looseEnds >= r.threshold);
+  const current = rows.length > 0 ? rows[rows.length - 1] : null;
+  const 起始混沌 = current ? current.起始混沌 : '—';
+  const 天气事件 = current ? current.天气事件 : '—';
+  const restrictions = rows.map(r => r.分部限制);
+  el.innerHTML = `
+    <div class="agency-limits-row"><span class="agency-limits-label">起始混沌</span><span class="agency-limits-value">${escapeHtml(String(起始混沌))}</span></div>
+    <div class="agency-limits-row"><span class="agency-limits-label">天气事件</span><span class="agency-limits-value">${escapeHtml(String(天气事件))}</span></div>
+    <div class="agency-limits-restrictions">
+      <span class="agency-limits-label">分部限制（可累计）</span>
+      ${restrictions.length === 0 ? '<p class="agency-limits-empty">当前散逸端未达任一阈值，无限制。</p>' : restrictions.map(t => `<p class="agency-limits-item">${escapeHtml(t)}</p>`).join('')}
+    </div>
+  `;
+}
 
 function renderNews() {
   if (!statuses) return;
@@ -1380,6 +1411,8 @@ function createNewAgent() {
 
 document.getElementById('saveBtn').addEventListener('click', save);
 document.getElementById('initBtn').addEventListener('click', initStatuses);
+document.getElementById('looseEnds')?.addEventListener('input', renderAgencyLimits);
+document.getElementById('looseEnds')?.addEventListener('change', renderAgencyLimits);
 document.getElementById('addNewsBtn').addEventListener('click', addNews);
 document.getElementById('newsText').addEventListener('keydown', e => {
   if (e.key === 'Enter') addNews();

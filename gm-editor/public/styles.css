@@ -278,7 +278,9 @@ body > * {
 }
 
 .agency-section,
-.news-section {
+.news-section,
+.agency-limits-section,
+.inmail-section {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -405,6 +407,54 @@ body > * {
   border-color: var(--accent-red);
 }
 
+.agency-limits-content {
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.agency-limits-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.agency-limits-label {
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.agency-limits-value {
+  font-weight: 500;
+  color: var(--accent-red);
+}
+
+.agency-limits-restrictions {
+  margin-top: 0.75rem;
+}
+
+.agency-limits-restrictions .agency-limits-label {
+  display: block;
+  margin-bottom: 0.35rem;
+}
+
+.agency-limits-item,
+.agency-limits-empty {
+  margin: 0 0 0.5rem 0;
+  padding-left: 0.5rem;
+  border-left: 2px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.agency-limits-empty {
+  font-style: italic;
+}
+
 .gm-section {
   margin-top: 1rem;
   padding-top: 1rem;
@@ -420,11 +470,6 @@ body > * {
   margin-top: 0.5rem;
 }
 
-.inmail-section {
-  margin-top: 1.5rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border);
-}
 
 .inmail-desc {
   font-size: 0.8rem;
