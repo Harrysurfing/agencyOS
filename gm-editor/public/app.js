@@ -1141,6 +1141,27 @@ async function save() {
   }
 }
 
+async function initStatuses() {
+  const warning = '初始化将把 statuses.json 重置为默认结构（机构混沌值/散逸端归零、空动态、空特工列表等），当前所有数据将丢失且无法恢复。\n\n确定继续？';
+  if (!confirm(warning)) return;
+  const defaultStatuses = {
+    agency: { 混沌值: 0, 散逸端: 0, news: [] },
+    agents: []
+  };
+  try {
+    const res = await fetch(`${API_BASE}/api/statuses`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(defaultStatuses)
+    });
+    if (!res.ok) throw new Error(await res.text());
+    await load();
+    showToast('已初始化 statuses.json');
+  } catch (err) {
+    showToast('初始化失败: ' + err.message);
+  }
+}
+
 function showToast(msg) {
   const el = document.getElementById('toast');
   el.textContent = msg;
@@ -1313,6 +1334,7 @@ function createNewAgent() {
 }
 
 document.getElementById('saveBtn').addEventListener('click', save);
+document.getElementById('initBtn').addEventListener('click', initStatuses);
 document.getElementById('addNewsBtn').addEventListener('click', addNews);
 document.getElementById('newsText').addEventListener('keydown', e => {
   if (e.key === 'Enter') addNews();

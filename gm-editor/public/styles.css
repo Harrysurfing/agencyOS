@@ -190,6 +190,23 @@ body > * {
   box-shadow: 0 0 15px var(--glow-red);
 }
 
+.init-btn {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  padding: 0.5rem 1rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.init-btn:hover {
+  color: var(--accent-red);
+  border-color: var(--accent-red);
+}
+
 .new-agent-btn {
   background: transparent;
   color: var(--accent-red);
