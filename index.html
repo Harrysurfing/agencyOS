@@ -570,6 +570,18 @@
       transform: rotate(90deg);
     }
 
+    .siphon-store-content .items-list-item .item-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .siphon-store-content .siphon-item-eye {
+      width: 1rem;
+      height: 1rem;
+      flex-shrink: 0;
+      stroke: currentColor;
+      opacity: 0.85;
+    }
     .siphon-store-content .items-list-item .item-price {
       flex-shrink: 0;
       color: var(--arc-anomaly);
@@ -2714,12 +2726,12 @@
   <div class="modal-overlay" id="siphonModalOverlay">
     <div class="modal siphon-modal" id="siphonModal">
       <div class="modal-header">
-        <h3 class="modal-title siphon-modal-title">Siphon的商店</h3>
+        <h3 class="modal-title siphon-modal-title" id="siphonModalTitle">正在尝试非法连接...</h3>
         <button class="modal-close" type="button" aria-label="关闭">×</button>
       </div>
       <div class="modal-body" id="siphonModalBody">
         <div id="siphonStep1">
-          <p class="siphon-help">正在尝试非法连接... 请输入密码</p>
+          <p class="siphon-help">请输入密码</p>
           <input type="password" id="siphonPassword" class="siphon-input" placeholder="密码" autocomplete="off">
           <button type="button" class="siphon-submit-btn" id="siphonSubmitBtn">连接</button>
         </div>
@@ -3327,8 +3339,10 @@
 
     const SIPHON_PASSWORD = 'x2';
 
+    const siphonModalTitleEl = document.getElementById('siphonModalTitle');
     function openSiphonModal() {
       document.getElementById('siphonModalOverlay').classList.add('open');
+      siphonModalTitleEl.textContent = '正在尝试非法连接';
       document.getElementById('siphonStep1').style.display = '';
       document.getElementById('siphonStep2').style.display = 'none';
       document.getElementById('siphonPassword').value = '';
@@ -3362,6 +3376,7 @@
       }
       errorEl.style.display = 'none';
       contentEl.style.display = 'block';
+      siphonModalTitleEl.textContent = 'Siphon的商店';
       contentEl.innerHTML = '<div class="items-list-loading">加载中…</div>';
       fetchJSON('siphon.json')
         .then(data => {
@@ -3373,10 +3388,11 @@
           contentEl.innerHTML = items.map(item => {
             const unit = item.priceUnit || '申诫';
             const priceStr = item.price != null ? item.price + ' ' + unit : '—';
+            const eyeSvg = '<svg class="siphon-item-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
             return `
             <details class="items-list-item">
               <summary>
-                <span class="item-title">${escapeHtml(item.name || '')}</span>
+                <span class="item-title">${eyeSvg}${escapeHtml(item.name || '')}</span>
                 <span class="item-price">${escapeHtml(priceStr)}</span>
               </summary>
               <div class="item-desc">${escapeHtml(item.description || '')}</div>
