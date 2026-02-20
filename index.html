@@ -298,6 +298,30 @@
       box-shadow: 0 0 12px var(--glow-red-soft);
     }
 
+    .siphon-btn {
+      padding: 0.5rem 0.65rem;
+      background: rgba(46, 77, 146, 0.15);
+      border: 1px solid rgba(46, 77, 146, 0.5);
+      color: var(--arc-anomaly);
+      font-family: inherit;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .siphon-btn:hover {
+      background: rgba(46, 77, 146, 0.3);
+      box-shadow: 0 0 10px rgba(46, 77, 146, 0.4);
+    }
+
+    .siphon-eye-icon {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -436,6 +460,117 @@
     .agency-dice-modal .modal-title {
       color: var(--accent-red);
       text-shadow: 0 0 8px var(--glow-red-soft);
+    }
+
+    .siphon-modal .modal-title.siphon-modal-title {
+      color: var(--arc-anomaly);
+      text-shadow: 0 0 8px rgba(46, 77, 146, 0.5);
+    }
+
+    .siphon-help {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.75rem;
+    }
+
+    .siphon-input {
+      width: 100%;
+      max-width: 200px;
+      padding: 0.5rem 0.6rem;
+      font-size: 0.9rem;
+      border: 1px solid rgba(46, 77, 146, 0.5);
+      border-radius: 4px;
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      margin-bottom: 0.75rem;
+    }
+
+    .siphon-submit-btn {
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+      background: rgba(46, 77, 146, 0.3);
+      color: var(--arc-anomaly);
+      border: 1px solid var(--arc-anomaly);
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .siphon-submit-btn:hover {
+      background: rgba(46, 77, 146, 0.45);
+    }
+
+    .siphon-error-msg {
+      color: var(--accent-red);
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .siphon-error-msg .siphon-error-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.25em;
+      height: 1.25em;
+      margin-right: 0.25rem;
+      background: var(--accent-red);
+      color: var(--bg-card);
+      border-radius: 50%;
+      font-size: 0.85em;
+      font-weight: 700;
+    }
+
+    .siphon-store-content .items-list-item {
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+      overflow: hidden;
+    }
+
+    .siphon-store-content .items-list-item summary {
+      padding: 0.6rem 0.75rem;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--arc-anomaly);
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .siphon-store-content .items-list-item summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .siphon-store-content .items-list-item summary::before {
+      content: '';
+      display: inline-block;
+      width: 0;
+      height: 0;
+      border-top: 4px solid transparent;
+      border-bottom: 4px solid transparent;
+      border-left: 5px solid currentColor;
+      margin-right: 0.5rem;
+    }
+
+    .siphon-store-content .items-list-item[open] summary::before {
+      transform: rotate(90deg);
+    }
+
+    .siphon-store-content .items-list-item .item-price {
+      flex-shrink: 0;
+      color: var(--arc-anomaly);
+      font-weight: 600;
+    }
+
+    .siphon-store-content .items-list-item .item-desc {
+      padding: 0 0.75rem 0.75rem;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      white-space: pre-line;
     }
 
     .agency-dice-hint {
@@ -2497,6 +2632,9 @@
         <button class="items-list-btn" id="agencyDiceBtn">机构骰子</button>
         <button class="items-list-btn" id="itemsListBtn">申领物列表</button>
         <button class="items-list-btn" id="missionArchiveBtn">任务档案库</button>
+        <button class="siphon-btn" id="siphonBtn" type="button" aria-label="Siphon的商店" title="Siphon的商店">
+          <svg class="siphon-eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
       </div>
     </div>
   </header>
@@ -2558,6 +2696,26 @@
       </div>
       <div class="modal-body">
         <div class="ta-report" id="jointAssessmentReport"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="siphonModalOverlay">
+    <div class="modal siphon-modal" id="siphonModal">
+      <div class="modal-header">
+        <h3 class="modal-title siphon-modal-title">Siphon的商店</h3>
+        <button class="modal-close" type="button" aria-label="关闭">×</button>
+      </div>
+      <div class="modal-body" id="siphonModalBody">
+        <div id="siphonStep1">
+          <p class="siphon-help">正在尝试非法连接... 请输入密码</p>
+          <input type="password" id="siphonPassword" class="siphon-input" placeholder="密码" autocomplete="off">
+          <button type="button" class="siphon-submit-btn" id="siphonSubmitBtn">连接</button>
+        </div>
+        <div id="siphonStep2" style="display:none">
+          <p id="siphonErrorMsg" class="siphon-error-msg" style="display:none"><span class="siphon-error-icon" aria-hidden="true">!</span> 访问被拒绝。机构安保协议已记录此事件。</p>
+          <div id="siphonStoreContent" class="siphon-store-content" style="display:none"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -2685,7 +2843,7 @@
         const bVal = Math.min(3, Math.max(0, parseInt(wk.b, 10) || 0));
         const wellKnownHtml = `
           <div class="well-known-track">
-            <span class="well-known-intro">广为人知</span>
+            <span class="well-known-intro">为人所知</span>
             <span class="well-known-label">A</span>
             <div class="well-known-boxes">${buildWellKnownBoxes(aVal)}</div>
             <span class="well-known-label">B</span>
@@ -2696,7 +2854,7 @@
           <summary>
             <span class="ability-summary-inner">
               <span class="ability-name">${escapeHtml(ab.name || '')}</span>
-              ${ab.熟练 ? '<span class="ability-proficient">(熟练)</span>' : ''}
+              ${ab.已练习 ? '<span class="ability-proficient">(已练习)</span>' : ''}
             </span>
           </summary>
           <div class="ref-item-desc">${formatDescriptionWithOutcomes(ab.description || '')}</div>
@@ -2732,7 +2890,7 @@
       const ARC_TRACK_HELP = {
         职能: '每当你在职能记录条上标记一格时，将任意一项资质的「资质保证上限」提升1点，最高不超过9点。<br>当你获得任务MVP时，在你的职能记录条上标记1格，且无需从其他记录条上移除一格。',
         现实: '每当你在现实记录条上标记一格时，将你与任意一段「关系」的「连结」提升1点。<br>当你既未获得任务MVP也未进入察看期时，你可以将你与任意一段关系的连结提升1点。',
-        异常: '每当你在异常记录条上标记一格时，选择一项：练习或广为人知。<br>• 练习：在任意一项异常能力上标记「熟练」。<br>• 广为人知：从一项异常能力中移除「熟练」标记，并向你的团队提出该能力的问题。在获得最多票数的答案轨道上做标记，然后获得所有已解锁的能力。<br>当你进入察看期时，在你的异常记录条上标记1格，且无需从其他记录条上移除一格。'
+        异常: '每当你在异常记录条上标记一格时，选择一项：练习或为人所知。<br>• 练习：在任意一项异常能力上标记「已练习」。<br>• 为人所知：从一项异常能力中移除「已练习」标记，并向你的团队提出该能力的问题。在获得最多票数的答案轨道上做标记，然后获得所有已解锁的能力。<br>当你进入察看期时，在你的异常记录条上标记1格，且无需从其他记录条上移除一格。'
       };
       function boxState(name, i) {
         const track = wallTracks[name] || { marked: 0, struck: 0 };
@@ -3156,6 +3314,70 @@
       document.getElementById('itemsListModalOverlay').classList.remove('open');
     }
 
+    const SIPHON_PASSWORD = 'x2';
+
+    function openSiphonModal() {
+      document.getElementById('siphonModalOverlay').classList.add('open');
+      document.getElementById('siphonStep1').style.display = '';
+      document.getElementById('siphonStep2').style.display = 'none';
+      document.getElementById('siphonPassword').value = '';
+      document.getElementById('siphonErrorMsg').style.display = 'none';
+      document.getElementById('siphonStoreContent').style.display = 'none';
+      document.getElementById('siphonStoreContent').innerHTML = '';
+    }
+
+    function closeSiphonModal() {
+      document.getElementById('siphonModalOverlay').classList.remove('open');
+    }
+
+    document.getElementById('siphonBtn').addEventListener('click', openSiphonModal);
+    document.getElementById('siphonModalOverlay').addEventListener('click', e => {
+      if (e.target.id === 'siphonModalOverlay') closeSiphonModal();
+    });
+    document.getElementById('siphonModal').querySelector('.modal-close').addEventListener('click', closeSiphonModal);
+
+    document.getElementById('siphonSubmitBtn').addEventListener('click', () => {
+      const input = document.getElementById('siphonPassword');
+      const pwd = (input.value || '').trim().toLowerCase();
+      document.getElementById('siphonStep1').style.display = 'none';
+      document.getElementById('siphonStep2').style.display = '';
+      const errorEl = document.getElementById('siphonErrorMsg');
+      const contentEl = document.getElementById('siphonStoreContent');
+      if (pwd !== SIPHON_PASSWORD.toLowerCase()) {
+        errorEl.style.display = 'block';
+        contentEl.style.display = 'none';
+        contentEl.innerHTML = '';
+        return;
+      }
+      errorEl.style.display = 'none';
+      contentEl.style.display = 'block';
+      contentEl.innerHTML = '<div class="items-list-loading">加载中…</div>';
+      fetchJSON('siphon.json')
+        .then(data => {
+          const items = data?.items || [];
+          if (items.length === 0) {
+            contentEl.innerHTML = '<div class="items-list-loading">暂无商品</div>';
+            return;
+          }
+          contentEl.innerHTML = items.map(item => {
+            const unit = item.priceUnit || '申诫';
+            const priceStr = item.price != null ? item.price + ' ' + unit : '—';
+            return `
+            <details class="items-list-item">
+              <summary>
+                <span class="item-title">${escapeHtml(item.name || '')}</span>
+                <span class="item-price">${escapeHtml(priceStr)}</span>
+              </summary>
+              <div class="item-desc">${escapeHtml(item.description || '')}</div>
+            </details>
+          `;
+          }).join('');
+        })
+        .catch(() => {
+          contentEl.innerHTML = '<div class="items-list-loading">加载失败</div>';
+        });
+    });
+
     let missionArchiveData = { missions: [] };
 
     function openMissionArchiveModal() {
@@ -3413,6 +3635,7 @@
       else if (document.getElementById('itemsListModalOverlay').classList.contains('open')) closeItemsListModal();
       else if (document.getElementById('agencyDiceModalOverlay').classList.contains('open')) closeAgencyDiceModal();
       else if (document.getElementById('jointAssessmentModalOverlay').classList.contains('open')) closeJointAssessmentModal();
+      else if (document.getElementById('siphonModalOverlay').classList.contains('open')) closeSiphonModal();
     });
 
     load();
