@@ -2686,6 +2686,11 @@
         overflow-x: auto;
       }
 
+      .agent-tabs .agent-tab {
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+
       .main-content {
         flex: 1;
         overflow: auto;
@@ -3018,7 +3023,7 @@
     let allAgents = [];
     let selectedAgentIndices = new Set();
     let statusesData = null;
-    const MAX_SELECTED_AGENTS = 3;
+    const MAX_SELECTED_AGENTS = 4;
 
     const AGENCY_RATINGS = [
       '评级良好',
@@ -3414,7 +3419,9 @@
       const showTabs = hasSelection && window.matchMedia('(max-width: 768px)').matches;
       const tabsHtml = showTabs ? agentIndexPairs.map((p, tabIdx) => {
         const label = p.agent.aka || p.agent.name || '未命名';
-        return `<button type="button" class="agent-tab ${tabIdx === 0 ? 'active' : ''}" data-tab-index="${tabIdx}" data-agent-index="${p.index}">${escapeHtml(label)}</button>`;
+        const displayLabel = label.length > 3 ? label.slice(0, 3) + '…' : label;
+        const titleAttr = label.length > 3 ? ` title="${escapeHtml(label)}"` : '';
+        return `<button type="button" class="agent-tab ${tabIdx === 0 ? 'active' : ''}" data-tab-index="${tabIdx}" data-agent-index="${p.index}"${titleAttr}>${escapeHtml(displayLabel)}</button>`;
       }).join('') : '';
 
       const cardsHtml = agentIndexPairs.map((p, i) => {
