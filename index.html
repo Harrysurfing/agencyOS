@@ -1742,6 +1742,16 @@
       flex: 1;
       overflow-y: auto;
       padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    #content:has(.welcome-state) {
+      flex: 1;
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
     }
 
     .main-content::-webkit-scrollbar {
@@ -2737,6 +2747,107 @@
       color: var(--text-secondary);
     }
 
+    .welcome-state {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .welcome-state .welcome-title {
+      font-size: clamp(1.25rem, 4vw, 2.5rem);
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin: 0 0 0.5rem 0;
+      text-shadow: 0 0 12px var(--glow-red-soft);
+    }
+
+    .welcome-state .welcome-title-typing {
+      display: inline-block;
+      overflow: hidden;
+      white-space: nowrap;
+      width: 0;
+      animation: welcome-title-type 1.6s steps(12) forwards,
+                 welcome-title-cursor 0.6s step-end infinite;
+      border-right: 0.12em solid var(--accent-red);
+    }
+
+    @keyframes welcome-title-type {
+      from { width: 0; }
+      to { width: 12.2em; }
+    }
+
+    @keyframes welcome-title-cursor {
+      50% { border-right-color: transparent; }
+    }
+
+    .welcome-state .welcome-subtitle {
+      font-size: clamp(0.9rem, 2.5vw, 1.25rem);
+      font-style: italic;
+      color: var(--text-secondary);
+      margin: 0 0 clamp(1.5rem, 5vw, 2.5rem) 0;
+    }
+
+    .welcome-triangle-wrap {
+      position: relative;
+      padding: clamp(24px, 8vmin, 48px);
+      animation: welcome-triangle-spin 8s linear infinite;
+    }
+
+    @keyframes welcome-triangle-spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .welcome-triangle-svg {
+      display: block;
+      width: clamp(100px, 28vmin, 200px);
+      height: clamp(100px, 28vmin, 200px);
+      overflow: visible;
+      filter: drop-shadow(0 0 12px var(--glow-red)) drop-shadow(0 0 24px rgba(196, 30, 58, 0.5));
+    }
+
+    .welcome-triangle-svg .triangle {
+      fill: var(--accent-red);
+      stroke: none;
+    }
+
+    .welcome-triangle-svg .ripple-circle {
+      fill: none;
+      stroke: var(--accent-red);
+      stroke-width: 1.5;
+      opacity: 0;
+      transform-origin: center;
+      transform-box: fill-box;
+      animation: welcome-ripple-out 2.4s ease-out infinite;
+    }
+
+    .welcome-triangle-svg .ripple-circle:nth-child(1) { animation-delay: 0s; }
+    .welcome-triangle-svg .ripple-circle:nth-child(2) { animation-delay: 0.4s; }
+    .welcome-triangle-svg .ripple-circle:nth-child(3) { animation-delay: 0.8s; }
+    .welcome-triangle-svg .ripple-circle:nth-child(4) { animation-delay: 1.2s; }
+    .welcome-triangle-svg .ripple-circle:nth-child(5) { animation-delay: 1.6s; }
+    .welcome-triangle-svg .ripple-circle:nth-child(6) { animation-delay: 2s; }
+    .welcome-triangle-svg .ripple-circle:nth-child(7) { animation-delay: 2.4s; }
+
+    @keyframes welcome-ripple-out {
+      0% {
+        transform: scale(0.15);
+        opacity: 0.7;
+      }
+      50% {
+        opacity: 0.35;
+      }
+      100% {
+        transform: scale(2.4);
+        opacity: 0;
+      }
+    }
+
     /* Subtle neon pulse */
     @keyframes neon-pulse {
 
@@ -3636,7 +3747,7 @@
 
       function updateAgentCount() {
         const n = selectedAgentIndices.size;
-        countEl.textContent = n > 0 ? `(${n})` : '全部';
+        countEl.textContent = n > 0 ? `(${n})` : '';
       }
       updateAgentCount();
     }
@@ -3644,15 +3755,33 @@
     function renderContent() {
       const content = document.getElementById('content');
       const hasSelection = selectedAgentIndices.size > 0;
-      const indices = hasSelection ? [...selectedAgentIndices].sort((a, b) => a - b) : allAgents.map((_, i) => i);
-      const agentIndexPairs = indices.map(i => ({ agent: allAgents[i], index: i })).filter(p => p.agent);
 
-      if (agentIndexPairs.length === 0) {
+      if (allAgents.length === 0) {
         content.innerHTML = '<div class="no-results">暂无特工数据</div>';
         return;
       }
 
-      const showTabs = hasSelection && window.matchMedia('(max-width: 768px)').matches;
+      if (!hasSelection) {
+        const rippleRadii = [12, 20, 28, 36, 44, 52, 60];
+        const ripples = rippleRadii.map(r => `<circle class="ripple-circle" cx="50" cy="50" r="${r}"/>`).join('');
+        content.innerHTML = `
+          <div class="welcome-state">
+            <p class="welcome-title"><span class="welcome-title-typing"><span class="welcome-title-typing-inner">欢迎使用AgencyOS</span></span></p>
+            <p class="welcome-subtitle">请选择特工以继续</p>
+            <div class="welcome-triangle-wrap">
+              <svg class="welcome-triangle-svg" viewBox="0 0 100 100" aria-hidden="true">
+                ${ripples}
+                <polygon class="triangle" points="50,12 88,80 12,80"/>
+              </svg>
+            </div>
+          </div>`;
+        return;
+      }
+
+      const indices = [...selectedAgentIndices].sort((a, b) => a - b);
+      const agentIndexPairs = indices.map(i => ({ agent: allAgents[i], index: i })).filter(p => p.agent);
+
+      const showTabs = window.matchMedia('(max-width: 768px)').matches;
       const tabsHtml = showTabs ? agentIndexPairs.map((p, tabIdx) => {
         const label = p.agent.aka || p.agent.name || '未命名';
         const displayLabel = label.length > 3 ? label.slice(0, 3) + '…' : label;
@@ -3684,10 +3813,6 @@
         });
         content.querySelectorAll('.agents-grid .agent-card-flip').forEach((card, i) => {
           card.classList.toggle('mobile-visible', i === 0);
-        });
-      } else if (window.matchMedia('(max-width: 768px)').matches && !hasSelection) {
-        content.querySelectorAll('.agents-grid .agent-card-flip').forEach(card => {
-          card.classList.add('mobile-visible');
         });
       }
     }
