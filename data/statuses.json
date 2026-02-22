@@ -664,7 +664,35 @@
         "现实": {
           "choice": "日程过载",
           "割裂进度": 0,
-          "关系": [],
+          "关系": [
+            {
+              "name": "安永华",
+              "actor": "劳伦斯",
+              "description": "经纪人公司老板",
+              "benefit": "",
+              "benefitDescription": "",
+              "benefitActive": false,
+              "closeness": 3
+            },
+            {
+              "name": "林铵",
+              "actor": "小白",
+              "description": "按摩店老板",
+              "benefit": "",
+              "benefitDescription": "",
+              "benefitActive": false,
+              "closeness": 6
+            },
+            {
+              "name": "丁乐",
+              "actor": "妙脆角",
+              "description": "负责的网红",
+              "benefit": "",
+              "benefitDescription": "",
+              "benefitActive": false,
+              "closeness": 3
+            }
+          ],
           "现实触发器": {
             "name": "工作手机",
             "description": "你有一部专用于你职业的智能手机。GM可随时使用现实触发器，让你的一段人际关系拨打这部电话。如果你不接，该人际关系将失去一点连结。\n如果你未能履行你职业的必要职责，或丢失了手机，请在一条四格的\"有所失\"条上标记下一个空格。当所有格子都被标记后再次发生这种情况，你的职业生涯将不可挽回地终结。若以此种或其他任何方式终结，你必须选择一个新的现实。"
@@ -690,10 +718,10 @@
       "qa": {
         "专注": 0,
         "共情": 0,
-        "气场": 0,
+        "气场": 3,
         "欺瞒": 0,
-        "主动": 0,
-        "专业": 0,
+        "主动": 3,
+        "专业": 3,
         "活力": 0,
         "坚毅": 0,
         "诡秘": 0
