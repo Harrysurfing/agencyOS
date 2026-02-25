@@ -597,6 +597,11 @@
 
     .agency-dice-modal {
       max-width: 420px;
+      transition: max-width 0.25s ease;
+    }
+
+    .agency-dice-modal.expanded {
+      max-width: 520px;
     }
 
     .agency-dice-modal .modal-title {
@@ -1119,6 +1124,114 @@
       font-weight: 600;
       color: var(--accent-red);
       font-size: 1rem;
+    }
+
+    .agency-dice-more-link {
+      display: block;
+      margin: 0.75rem auto 0;
+      background: none;
+      border: none;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.9rem;
+      color: var(--arc-anomaly);
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      transition: color 0.15s, opacity 0.15s;
+    }
+
+    .agency-dice-more-link:hover {
+      color: #5a7bc4;
+      opacity: 0.95;
+    }
+
+    .agency-dice-extra {
+      margin-top: 1.25rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid rgba(46, 77, 146, 0.35);
+    }
+
+    .agency-dice-extra-hint {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      text-align: center;
+      margin: 0 0 0.75rem 0;
+    }
+
+    .agency-dice-extra-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.25rem;
+    }
+
+    .agency-die-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .agency-die-label {
+      font-size: 0.75rem;
+      color: var(--arc-anomaly);
+      font-weight: 600;
+    }
+
+    .poly-die {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      background: rgba(46, 77, 146, 0.12);
+      border: 2px solid var(--arc-anomaly);
+      border-radius: 4px;
+      color: var(--arc-anomaly);
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 0 10px rgba(46, 77, 146, 0.2);
+    }
+
+    .poly-die:hover {
+      box-shadow: 0 0 14px rgba(46, 77, 146, 0.4);
+      transform: scale(1.05);
+    }
+
+    .poly-die.rolling {
+      animation: poly-die-roll 0.4s ease-out;
+    }
+
+    @keyframes poly-die-roll {
+      0% { transform: scale(1); }
+      30% { transform: scale(1.15); }
+      70% { transform: scale(0.95); }
+      100% { transform: scale(1); }
+    }
+
+    .poly-die-value {
+      font-size: 1.25rem;
+      line-height: 1;
+      text-shadow: 0 0 6px rgba(46, 77, 146, 0.5);
+    }
+
+    .d6-die {
+      width: 52px;
+      height: 52px;
+      font-size: 1.35rem;
+    }
+
+    .d10-die {
+      width: 52px;
+      height: 58px;
+      border-radius: 6px;
+    }
+
+    .d20-die {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      font-size: 1.1rem;
     }
 
     .joint-assessment-modal .modal-title.joint-assessment-title {
@@ -3300,6 +3413,30 @@
           <div class="d4-die" data-value="1"><span class="d4-triangle"></span><span class="d4-value">1</span></div>
         </div>
         <p class="agency-dice-success" id="agencyDiceSuccess">成功：0</p>
+        <button type="button" class="agency-dice-more-link" id="agencyDiceMoreLink">我需要更多</button>
+        <div class="agency-dice-extra" id="agencyDiceExtra" style="display:none">
+          <p class="agency-dice-extra-hint">点击骰子掷出</p>
+          <div class="agency-dice-extra-grid">
+            <div class="agency-die-wrap" title="d6">
+              <div class="poly-die d6-die" id="agencyD6Die" data-sides="6" data-value="1">
+                <span class="poly-die-value">1</span>
+              </div>
+              <span class="agency-die-label">d6</span>
+            </div>
+            <div class="agency-die-wrap" title="d10">
+              <div class="poly-die d10-die" id="agencyD10Die" data-sides="10" data-value="1">
+                <span class="poly-die-value">1</span>
+              </div>
+              <span class="agency-die-label">d10</span>
+            </div>
+            <div class="agency-die-wrap" title="d20">
+              <div class="poly-die d20-die" id="agencyD20Die" data-sides="20" data-value="1">
+                <span class="poly-die-value">1</span>
+              </div>
+              <span class="agency-die-label">d20</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -4293,6 +4430,8 @@
 
     function closeAgencyDiceModal() {
       document.getElementById('agencyDiceModalOverlay').classList.remove('open');
+      agencyDiceModal?.classList.remove('expanded');
+      if (agencyDiceExtra) agencyDiceExtra.style.display = 'none';
     }
 
     document.getElementById('agencyDiceBtn').addEventListener('click', openAgencyDiceModal);
@@ -4302,8 +4441,49 @@
     document.getElementById('agencyDiceModal').querySelector('.modal-close').addEventListener('click', closeAgencyDiceModal);
     document.getElementById('agencyDiceBody').addEventListener('click', e => {
       if (e.target.closest('.modal-close')) return;
+      if (e.target.closest('.agency-dice-more-link')) return;
+      if (e.target.closest('.poly-die')) return;
       e.preventDefault();
       rollAgencyDice();
+    });
+
+    const agencyDiceMoreLink = document.getElementById('agencyDiceMoreLink');
+    const agencyDiceExtra = document.getElementById('agencyDiceExtra');
+    const agencyDiceModal = document.getElementById('agencyDiceModal');
+    if (agencyDiceMoreLink && agencyDiceExtra && agencyDiceModal) {
+      agencyDiceMoreLink.addEventListener('click', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        const isExpanded = agencyDiceModal.classList.toggle('expanded');
+        agencyDiceExtra.style.display = isExpanded ? 'block' : 'none';
+      });
+    }
+
+    function rollPolyDie(el) {
+      if (!el || !el.dataset.sides) return;
+      const sides = parseInt(el.dataset.sides, 10);
+      const v = Math.floor(Math.random() * sides) + 1;
+      el.dataset.value = String(v);
+      const valEl = el.querySelector('.poly-die-value');
+      if (valEl) valEl.textContent = String(v);
+      el.classList.add('rolling');
+      setTimeout(() => el.classList.remove('rolling'), 400);
+    }
+
+    document.getElementById('agencyD6Die')?.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      rollPolyDie(e.currentTarget);
+    });
+    document.getElementById('agencyD10Die')?.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      rollPolyDie(e.currentTarget);
+    });
+    document.getElementById('agencyD20Die')?.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      rollPolyDie(e.currentTarget);
     });
 
     document.getElementById('glitchSosBtn').addEventListener('click', openJointAssessmentModal);
