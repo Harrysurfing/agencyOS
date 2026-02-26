@@ -110,10 +110,10 @@
               "name": "爱迪生瓦罗内",
               "actor": "弗兰克",
               "description": "互相仿效和较劲的兄弟",
-              "benefit": "",
-              "benefitDescription": "",
-              "benefitActive": false,
-              "closeness": 6
+              "benefit": "睿智",
+              "benefitDescription": "这个人总是能抢先几步。在您的下一次任务中，您可以在任何时候打电话给他们，从而在危险或潜在悲剧发生前得到警告。",
+              "benefitActive": true,
+              "closeness": 7
             }
           ],
           "现实触发器": {
@@ -164,18 +164,18 @@
       "wallTracks": {
         "异常": {
           "marked": 1,
-          "struck": 2
+          "struck": 5
         },
         "现实": {
-          "marked": 1,
-          "struck": 2
+          "marked": 2,
+          "struck": 4
         },
         "职能": {
-          "marked": 1,
-          "struck": 2
+          "marked": 4,
+          "struck": 3
         }
       },
-      "机构头衔": "见习生"
+      "机构头衔": "专员"
     },
     {
       "id": "agent-2",
@@ -803,7 +803,35 @@
         "现实": {
           "choice": "明星",
           "割裂进度": 0,
-          "关系": [],
+          "关系": [
+            {
+              "name": "砂糖",
+              "actor": "",
+              "description": "经纪人，受伤的前吉他手",
+              "benefit": "有影响力",
+              "benefitDescription": "每次任务中，你可以告诉这个人一个想法、一种潮流或一个观点，他们会立即通过自己的关系网将其传播出去。此后，除了最离群索居的人以外，你遇到的所有人都会知道这个想法，并已形成自己的看法。",
+              "benefitActive": true,
+              "closeness": 7
+            },
+            {
+              "name": "Aoi",
+              "actor": "",
+              "description": "对手，单飞的萨克斯手",
+              "benefit": "",
+              "benefitDescription": "",
+              "benefitActive": false,
+              "closeness": 3
+            },
+            {
+              "name": "佐佐木",
+              "actor": "",
+              "description": "钢琴导师，偶像",
+              "benefit": "",
+              "benefitDescription": "",
+              "benefitActive": false,
+              "closeness": 3
+            }
+          ],
           "现实触发器": {
             "name": "你的头号粉丝",
             "description": "你的粉丝无处不在，而且他们都想找机会和你说话。GM可使用现实触发器，让某人认出你，并拼命想引起你的注意。如果你不理他们，他们现在就会大吵大闹，之后还会在网上抱怨：你名声扫地，损失最大的那段人际关系会失去一点连结。\n如果你做出有损声誉的事，你的名声便会开始消退。在一条四格的\"陨落\"条上标记下一个空格。当\"陨落\"条被填满时，或当你放弃自己的目标时，你的明星之路便告终结：你必须选择一个新的现实。"
@@ -832,12 +860,12 @@
         "气场": 0,
         "欺瞒": 0,
         "主动": 0,
-        "专业": 3,
+        "专业": 4,
         "活力": 0,
         "坚毅": 3,
         "诡秘": 0
       },
-      "嘉奖": 1,
+      "嘉奖": 4,
       "申诫": 0,
       "察看期": 0,
       "mvp": 0,
@@ -851,16 +879,16 @@
       ],
       "wallTracks": {
         "异常": {
-          "marked": 0,
-          "struck": 0
+          "marked": 1,
+          "struck": 2
         },
         "现实": {
-          "marked": 0,
-          "struck": 0
+          "marked": 1,
+          "struck": 2
         },
         "职能": {
-          "marked": 0,
-          "struck": 0
+          "marked": 1,
+          "struck": 2
         }
       },
       "机构头衔": "见习生"
