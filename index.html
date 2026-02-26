@@ -1350,6 +1350,89 @@
       border-bottom-color: var(--accent-red);
     }
 
+    .agency-dice-modal {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ability-flash {
+      display: none;
+      position: absolute;
+      inset: 0;
+      z-index: 50;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .ability-flash.active {
+      display: block;
+    }
+
+    .ability-flash-img {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: auto;
+      height: 75%;
+      max-height: 280px;
+      transform: translate(120%, -50%);
+      object-fit: contain;
+      filter: drop-shadow(0 0 16px rgba(46, 77, 146, 0.6))
+              drop-shadow(0 0 40px rgba(46, 77, 146, 0.35));
+      animation: ability-swoosh 1.8s ease-in-out forwards;
+    }
+
+    @keyframes ability-swoosh {
+      0% {
+        transform: translate(120%, -50%) scale(0.7);
+        opacity: 0;
+        filter: drop-shadow(0 0 16px rgba(46, 77, 146, 0.6))
+                drop-shadow(0 0 40px rgba(46, 77, 146, 0.35));
+      }
+      20% {
+        transform: translate(-50%, -50%) scale(1.05);
+        opacity: 1;
+        filter: drop-shadow(0 0 24px rgba(46, 77, 146, 0.8))
+                drop-shadow(0 0 60px rgba(46, 77, 146, 0.5));
+      }
+      25% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+      65% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+        filter: drop-shadow(0 0 20px rgba(46, 77, 146, 0.7))
+                drop-shadow(0 0 50px rgba(46, 77, 146, 0.4));
+      }
+      85% {
+        transform: translate(-160%, -50%) scale(0.8);
+        opacity: 0.4;
+        filter: drop-shadow(0 0 8px rgba(46, 77, 146, 0.3))
+                drop-shadow(0 0 20px rgba(46, 77, 146, 0.15));
+      }
+      100% {
+        transform: translate(-200%, -50%) scale(0.6);
+        opacity: 0;
+      }
+    }
+
+    .ability-flash.active::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, rgba(46, 77, 146, 0.15) 0%, transparent 70%);
+      animation: ability-bg-pulse 1.8s ease-in-out forwards;
+      pointer-events: none;
+    }
+
+    @keyframes ability-bg-pulse {
+      0% { opacity: 0; }
+      20% { opacity: 1; }
+      65% { opacity: 0.8; }
+      100% { opacity: 0; }
+    }
+
     .joint-assessment-modal .modal-title.joint-assessment-title {
       font-size: 0.9rem;
       color: var(--text-secondary);
@@ -3514,6 +3597,9 @@
 
   <div class="modal-overlay" id="agencyDiceModalOverlay">
     <div class="modal agency-dice-modal" id="agencyDiceModal">
+      <div class="ability-flash" id="abilityFlash" aria-hidden="true">
+        <img class="ability-flash-img" src="assets/ability.png" alt="">
+      </div>
       <div class="modal-header">
         <h3 class="modal-title">机构骰子</h3>
         <button class="modal-close" type="button" aria-label="关闭">×</button>
@@ -4615,15 +4701,31 @@
       setTimeout(() => el.classList.remove('rolling'), 500);
     }
 
+    let abilityFlashTimer = null;
+    function triggerAbilityFlash() {
+      const flash = document.getElementById('abilityFlash');
+      if (!flash) return;
+      flash.classList.remove('active');
+      const img = flash.querySelector('.ability-flash-img');
+      if (img) { img.style.animation = 'none'; img.offsetHeight; img.style.animation = ''; }
+      clearTimeout(abilityFlashTimer);
+      requestAnimationFrame(() => {
+        flash.classList.add('active');
+        abilityFlashTimer = setTimeout(() => flash.classList.remove('active'), 1900);
+      });
+    }
+
     document.getElementById('agencyD6Die')?.addEventListener('click', e => {
       e.preventDefault();
       e.stopPropagation();
       rollPolyDie(e.currentTarget);
+      triggerAbilityFlash();
     });
     document.getElementById('agencyD10Die')?.addEventListener('click', e => {
       e.preventDefault();
       e.stopPropagation();
       rollPolyDie(e.currentTarget);
+      triggerAbilityFlash();
     });
     document.getElementById('agencyD8Die')?.addEventListener('click', e => {
       e.preventDefault();
