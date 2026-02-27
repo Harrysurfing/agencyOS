@@ -222,10 +222,10 @@
               "name": "爱丽丝",
               "actor": "弗兰克",
               "description": "一个话唠的前同事，超爱分享她的故事",
-              "benefit": "",
-              "benefitDescription": "",
-              "benefitActive": false,
-              "closeness": 3
+              "benefit": "博学",
+              "benefitDescription": "如果你需要了解一段历史信息或某件机械的运作原理，你可以在任务期间给此人打一次电话，他们总能可靠地给出答案。向他们透露过多信息仍可能制造散逸端。",
+              "benefitActive": true,
+              "closeness": 4
             },
             {
               "name": "Marcus",
@@ -233,8 +233,8 @@
               "description": "互有好感。 城市空间设计的顾问。",
               "benefit": "博学",
               "benefitDescription": "如果你需要了解一段历史信息或某件机械的运作原理，你可以在任务期间给此人打一次电话，他们总能可靠地给出答案。向他们透露过多信息仍可能制造散逸端。",
-              "benefitActive": false,
-              "closeness": 7
+              "benefitActive": true,
+              "closeness": 8
             },
             {
               "name": "卢卡斯",
@@ -298,19 +298,19 @@
       ],
       "wallTracks": {
         "异常": {
-          "marked": 1,
-          "struck": 2
+          "marked": 2,
+          "struck": 4
         },
         "现实": {
-          "marked": 1,
-          "struck": 2
+          "marked": 2,
+          "struck": 4
         },
         "职能": {
-          "marked": 1,
-          "struck": 2
+          "marked": 2,
+          "struck": 4
         }
       },
-      "机构头衔": "见习生"
+      "机构头衔": "专员"
     },
     {
       "id": "agent-3",
@@ -605,7 +605,7 @@
         "坚毅": 3,
         "诡秘": 0
       },
-      "嘉奖": 6,
+      "嘉奖": 11,
       "申诫": 0,
       "察看期": 0,
       "mvp": 0,
