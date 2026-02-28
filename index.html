@@ -604,6 +604,265 @@
       text-shadow: 0 0 8px var(--glow-red-soft);
     }
 
+    .map-modal {
+      max-width: 720px;
+    }
+
+    .map-modal .modal-title.map-modal-title {
+      color: var(--accent-red);
+      text-shadow: 0 0 8px var(--glow-red-soft);
+    }
+
+    .map-modal-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.75rem;
+    }
+
+    .map-poi-select-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+      flex-shrink: 0;
+    }
+
+    .map-poi-select-label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+    }
+
+    .map-poi-custom-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .map-poi-select-trigger {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      min-height: 44px;
+      padding: 0.5rem 0.75rem;
+      font-size: 1rem;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-primary);
+      cursor: pointer;
+      text-align: left;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .map-poi-select-value {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .map-poi-select-chevron {
+      flex-shrink: 0;
+      margin-left: 0.5rem;
+      opacity: 0.7;
+      font-size: 0.75rem;
+    }
+
+    .map-poi-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      margin-top: 0.25rem;
+      max-height: min(70vh, 320px);
+      overflow-y: auto;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      z-index: 100;
+      display: none;
+    }
+
+    .map-poi-dropdown.open {
+      display: block;
+    }
+
+    .map-poi-option {
+      display: block;
+      width: 100%;
+      min-height: 48px;
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      line-height: 1.4;
+      text-align: left;
+      background: none;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-primary);
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .map-poi-option:last-child {
+      border-bottom: none;
+    }
+
+    .map-poi-option:hover,
+    .map-poi-option:focus {
+      background: rgba(196, 30, 58, 0.15);
+    }
+
+    .map-poi-option.selected {
+      background: rgba(196, 30, 58, 0.2);
+      color: var(--accent-red);
+    }
+
+    @media (max-width: 768px) {
+      .map-poi-select-wrap {
+        flex-wrap: wrap;
+      }
+      .map-poi-custom-wrap {
+        flex-basis: 100%;
+      }
+      .map-poi-option {
+        min-height: 52px;
+        padding: 0.9rem 1rem;
+        font-size: 1.05rem;
+      }
+    }
+
+    .map-container {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1;
+      max-height: 65vh;
+      min-height: 280px;
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      touch-action: none;
+      cursor: grab;
+      user-select: none;
+    }
+    .map-container.map-dragging {
+      cursor: grabbing;
+    }
+
+    .map-zoom-controls {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .map-zoom-btn,
+    .map-zoom-reset {
+      width: 2.25rem;
+      height: 2.25rem;
+      min-height: 44px;
+      min-width: 44px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      font-weight: 600;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-primary);
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .map-zoom-btn:hover,
+    .map-zoom-reset:hover {
+      border-color: var(--accent-red);
+      color: var(--accent-red);
+    }
+
+    .map-zoom-reset {
+      font-size: 0.75rem;
+      height: auto;
+      min-height: 36px;
+    }
+
+    .map-container .items-list-loading {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+    }
+
+    .map-svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
+    .map-svg .map-bg {
+      fill: var(--bg-dark);
+    }
+
+    .map-svg .map-area {
+      stroke: #15181c;
+      stroke-width: 0.4;
+    }
+
+    .map-svg .map-grid-line {
+      stroke: var(--accent-red);
+      stroke-opacity: 0.25;
+      stroke-width: 0.25;
+      fill: none;
+    }
+
+    .map-svg .map-area-label {
+      font-size: 2.8px;
+      font-weight: 500;
+      fill: var(--text-secondary);
+      fill-opacity: 0.6;
+      text-anchor: middle;
+      pointer-events: none;
+    }
+
+    .map-svg .map-marker-wrap {
+      cursor: default;
+    }
+
+    .map-svg .map-marker-wrap:hover {
+      filter: drop-shadow(0 0 3px var(--glow-red));
+    }
+
+    .map-svg .map-marker-pin {
+      fill: var(--accent-red);
+      stroke: var(--bg-dark);
+      stroke-width: 0.35;
+    }
+
+    .map-svg .map-marker-ripple {
+      fill: none;
+      stroke: var(--accent-red);
+      stroke-width: 0.4;
+    }
+
+    .map-svg .map-marker-label {
+      font-size: 2px;
+      fill: var(--text-primary);
+      fill-opacity: 0.9;
+      text-anchor: middle;
+      pointer-events: none;
+    }
+
     .siphon-modal .modal-title.siphon-modal-title {
       color: var(--arc-anomaly);
       text-shadow: 0 0 8px rgba(46, 77, 146, 0.5);
@@ -3247,6 +3506,10 @@
           </span>
           <span class="banner-btn-label">机构邮箱</span>
         </button>
+        <button class="items-list-btn banner-btn-with-label" id="mapBtn" type="button" aria-label="三连城地图" title="三连城地图">
+          <span class="banner-btn-cell"><svg class="banner-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></span>
+          <span class="banner-btn-label">城市地图</span>
+        </button>
         <button class="siphon-btn banner-btn-with-label" id="siphonBtn" type="button" aria-label="Siphon的商店" title="Siphon的商店">
           <span class="banner-btn-cell"><svg class="siphon-eye-icon banner-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span>
           <span class="banner-btn-label">U???</span>
@@ -3334,6 +3597,37 @@
         <div id="siphonStep2" style="display:none">
           <p id="siphonErrorMsg" class="siphon-error-msg" style="display:none"><span class="siphon-error-icon" aria-hidden="true">!</span> 访问被拒绝。机构安保协议已记录此事件。</p>
           <div id="siphonStoreContent" class="siphon-store-content" style="display:none"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="mapModalOverlay">
+    <div class="modal map-modal" id="mapModal">
+      <div class="modal-header">
+        <h3 class="modal-title map-modal-title" id="mapModalTitle">三连城</h3>
+        <button class="modal-close" type="button" aria-label="关闭">×</button>
+      </div>
+      <div class="modal-body map-modal-body">
+        <p class="map-modal-subtitle" id="mapModalSubtitle"></p>
+        <div class="map-poi-select-wrap">
+          <label class="map-poi-select-label">显示地点</label>
+          <div class="map-poi-custom-wrap">
+            <button type="button" class="map-poi-select-trigger" id="mapPoiSelectTrigger" aria-haspopup="listbox" aria-expanded="false" aria-label="选择要显示的地点">
+              <span class="map-poi-select-value" id="mapPoiSelectValue">—</span>
+              <span class="map-poi-select-chevron" aria-hidden="true">▾</span>
+            </button>
+            <div class="map-poi-dropdown" id="mapPoiDropdown" role="listbox" aria-hidden="true"></div>
+          </div>
+        </div>
+        <div class="map-container" id="mapContainer">
+          <div class="items-list-loading" id="mapLoading">加载中…</div>
+          <div class="map-zoom-controls" id="mapZoomControls">
+            <button type="button" class="map-zoom-btn" id="mapZoomIn" aria-label="放大">+</button>
+            <button type="button" class="map-zoom-btn" id="mapZoomOut" aria-label="缩小">−</button>
+            <button type="button" class="map-zoom-reset" id="mapZoomReset">重置</button>
+          </div>
+          <svg class="map-svg" id="mapSvg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
         </div>
       </div>
     </div>
@@ -4252,6 +4546,222 @@
     });
     document.getElementById('missionArchiveModal').querySelector('.modal-close').addEventListener('click', closeMissionArchiveModal);
 
+    function mapAreaCentroid(boundaries) {
+      const pts = (boundaries || []).map(b => Array.isArray(b) ? { x: b[0], y: b[1] } : { x: b.x, y: b.y });
+      if (pts.length === 0) return { x: 50, y: 50 };
+      const sum = pts.reduce((a, p) => ({ x: a.x + p.x, y: a.y + p.y }), { x: 0, y: 0 });
+      return { x: sum.x / pts.length, y: sum.y / pts.length };
+    }
+
+    let mapDataCache = null;
+    let mapSelectedPoiId = '';
+
+    function renderMapContent(data, selectedPoiId) {
+      const svgEl = document.getElementById('mapSvg');
+      if (!svgEl || !data) return;
+      const areas = data.areas || [];
+      const markers = selectedPoiId ? (data.markers || []).filter(m => (m.id || '') === selectedPoiId) : [];
+      let svgHtml = '<rect class="map-bg" x="0" y="0" width="100" height="100"/>';
+      areas.forEach(area => {
+        const bounds = area.boundaries || [];
+        const pts = bounds.map(b => Array.isArray(b) ? b.join(',') : `${b.x},${b.y}`);
+        if (pts.length < 2) return;
+        const points = pts.join(' ');
+        svgHtml += `<polygon class="map-area" points="${points}" fill="${escapeHtml(area.color || '#16181c')}" data-area-name="${escapeHtml(area.name || '')}"/>`;
+      });
+      for (let i = 0; i <= 100; i += 5) {
+        svgHtml += `<line class="map-grid-line" x1="${i}" y1="0" x2="${i}" y2="100"/>`;
+        svgHtml += `<line class="map-grid-line" x1="0" y1="${i}" x2="100" y2="${i}"/>`;
+      }
+      areas.forEach(area => {
+        const bounds = area.boundaries || [];
+        if (bounds.length < 2) return;
+        const cen = mapAreaCentroid(bounds);
+        svgHtml += `<text class="map-area-label" x="${cen.x}" y="${cen.y}">${escapeHtml(area.name || '')}</text>`;
+      });
+      const PIN_OFFSET = 2;
+      markers.forEach(m => {
+        const cx = Number(m.x) || 0;
+        const cy = Number(m.y) || 0;
+        const label = m.label || '';
+        const isSelected = !!selectedPoiId;
+        const wrapClass = 'map-marker-wrap' + (isSelected ? ' map-marker-selected' : '');
+        const rippleHtml = isSelected ? `<g transform="translate(${cx},${cy})"><circle class="map-marker-ripple" cx="0" cy="0" r="4"><animateTransform attributeName="transform" type="scale" from="0.3" to="1" dur="1.8s" repeatCount="indefinite" additive="replace"/><animate attributeName="stroke-opacity" from="0.8" to="0" dur="1.8s" repeatCount="indefinite"/></circle><circle class="map-marker-ripple map-marker-ripple-2" cx="0" cy="0" r="4"><animateTransform attributeName="transform" type="scale" from="0.3" to="1" dur="1.8s" repeatCount="indefinite" additive="replace" begin="0.9s"/><animate attributeName="stroke-opacity" from="0.8" to="0" dur="1.8s" repeatCount="indefinite" begin="0.9s"/></circle></g>` : '';
+        svgHtml += `<g class="${wrapClass}" title="${escapeHtml(label)}">${rippleHtml}<circle class="map-marker-pin" cx="${cx}" cy="${cy}" r="1.2"/></g>`;
+        if (label) svgHtml += `<text class="map-marker-label" x="${cx}" y="${cy + PIN_OFFSET + 2.5}">${escapeHtml(label)}</text>`;
+      });
+      svgEl.innerHTML = svgHtml;
+      updateMapViewBox();
+    }
+
+    let mapZoom = 1;
+    let mapPanX = 0;
+    let mapPanY = 0;
+    const MAP_ZOOM_MIN = 0.5;
+    const MAP_ZOOM_MAX = 3;
+
+    function updateMapViewBox() {
+      const svgEl = document.getElementById('mapSvg');
+      if (!svgEl) return;
+      const w = 100 / mapZoom;
+      const h = 100 / mapZoom;
+      const minX = 50 - 50 / mapZoom + mapPanX;
+      const minY = 50 - 50 / mapZoom + mapPanY;
+      svgEl.setAttribute('viewBox', `${minX} ${minY} ${w} ${h}`);
+    }
+
+    function openMapModal() {
+      const overlay = document.getElementById('mapModalOverlay');
+      const titleEl = document.getElementById('mapModalTitle');
+      const subtitleEl = document.getElementById('mapModalSubtitle');
+      const loadingEl = document.getElementById('mapLoading');
+      const svgEl = document.getElementById('mapSvg');
+      overlay.classList.add('open');
+      loadingEl.style.display = 'flex';
+      svgEl.style.display = 'none';
+      fetchJSON('map.json')
+        .then(data => {
+          mapDataCache = data;
+          mapZoom = 1;
+          mapPanX = 0;
+          mapPanY = 0;
+          mapSelectedPoiId = 'poi-hq';
+          titleEl.textContent = data.title || '三连城';
+          subtitleEl.textContent = data.subtitle || '';
+          subtitleEl.style.display = data.subtitle ? 'block' : 'none';
+          const dropdownEl = document.getElementById('mapPoiDropdown');
+          const valueEl = document.getElementById('mapPoiSelectValue');
+          const triggerEl = document.getElementById('mapPoiSelectTrigger');
+          if (dropdownEl && valueEl && triggerEl) {
+            const defaultId = 'poi-hq';
+            dropdownEl.innerHTML = '<button type="button" class="map-poi-option" data-value="" role="option">—</button>' + (data.markers || []).map(m => {
+              const id = m.id || '';
+              const label = escapeHtml(m.label || id);
+              const sel = id === defaultId ? ' selected' : '';
+              return `<button type="button" class="map-poi-option${sel}" data-value="${escapeHtml(id)}" role="option">${label}</button>`;
+            }).join('');
+            const defaultMarker = (data.markers || []).find(m => (m.id || '') === defaultId);
+            valueEl.textContent = defaultMarker ? (defaultMarker.label || '机构总部') : '机构总部';
+            dropdownEl.classList.remove('open');
+            dropdownEl.setAttribute('aria-hidden', 'true');
+            triggerEl.setAttribute('aria-expanded', 'false');
+          }
+          renderMapContent(data, 'poi-hq');
+          loadingEl.style.display = 'none';
+          svgEl.style.display = 'block';
+        })
+        .catch(() => {
+          loadingEl.textContent = '加载失败';
+        });
+    }
+
+    const mapPoiTrigger = document.getElementById('mapPoiSelectTrigger');
+    const mapPoiDropdown = document.getElementById('mapPoiDropdown');
+    const mapPoiValue = document.getElementById('mapPoiSelectValue');
+    if (mapPoiTrigger && mapPoiDropdown && mapPoiValue) {
+      mapPoiTrigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = mapPoiDropdown.classList.toggle('open');
+        mapPoiDropdown.setAttribute('aria-hidden', String(!isOpen));
+        mapPoiTrigger.setAttribute('aria-expanded', String(isOpen));
+      });
+      mapPoiDropdown.addEventListener('click', (e) => {
+        const opt = e.target.closest('.map-poi-option');
+        if (!opt) return;
+        const val = opt.getAttribute('data-value') || '';
+        const label = opt.textContent || '—';
+        mapSelectedPoiId = val;
+        mapPoiValue.textContent = label;
+        mapPoiDropdown.querySelectorAll('.map-poi-option').forEach(o => o.classList.remove('selected'));
+        opt.classList.add('selected');
+        mapPoiDropdown.classList.remove('open');
+        mapPoiDropdown.setAttribute('aria-hidden', 'true');
+        mapPoiTrigger.setAttribute('aria-expanded', 'false');
+        if (mapDataCache) renderMapContent(mapDataCache, mapSelectedPoiId);
+      });
+      document.addEventListener('click', () => {
+        mapPoiDropdown.classList.remove('open');
+        mapPoiDropdown.setAttribute('aria-hidden', 'true');
+        mapPoiTrigger.setAttribute('aria-expanded', 'false');
+      });
+    }
+
+    document.getElementById('mapZoomIn')?.addEventListener('click', () => {
+      if (mapZoom >= MAP_ZOOM_MAX) return;
+      mapZoom = Math.min(MAP_ZOOM_MAX, mapZoom * 1.25);
+      updateMapViewBox();
+    });
+    document.getElementById('mapZoomOut')?.addEventListener('click', () => {
+      if (mapZoom <= MAP_ZOOM_MIN) return;
+      mapZoom = Math.max(MAP_ZOOM_MIN, mapZoom / 1.25);
+      updateMapViewBox();
+    });
+    document.getElementById('mapZoomReset')?.addEventListener('click', () => {
+      mapZoom = 1;
+      mapPanX = 0;
+      mapPanY = 0;
+      updateMapViewBox();
+    });
+    const mapContainerEl = document.getElementById('mapContainer');
+    const mapSvgEl = document.getElementById('mapSvg');
+    if (mapContainerEl) {
+      mapContainerEl.addEventListener('wheel', (e) => {
+        if (!mapContainerEl.closest('.modal-overlay.open')) return;
+        e.preventDefault();
+        if (e.deltaY < 0) mapZoom = Math.min(MAP_ZOOM_MAX, mapZoom * 1.1);
+        else mapZoom = Math.max(MAP_ZOOM_MIN, mapZoom / 1.1);
+        updateMapViewBox();
+      }, { passive: false });
+      let mapDragStart = null;
+      function applyPan(clientX, clientY) {
+        if (!mapDragStart || !mapSvgEl) return;
+        const scale = (100 / mapZoom) / Math.min(mapSvgEl.clientWidth, mapSvgEl.clientHeight);
+        mapPanX = mapDragStart.panX - (clientX - mapDragStart.x) * scale;
+        mapPanY = mapDragStart.panY - (clientY - mapDragStart.y) * scale;
+        const maxPan = 50 - 50 / mapZoom;
+        mapPanX = Math.max(-maxPan, Math.min(maxPan, mapPanX));
+        mapPanY = Math.max(-maxPan, Math.min(maxPan, mapPanY));
+        updateMapViewBox();
+      }
+      function endDrag() {
+        mapDragStart = null;
+        mapContainerEl.classList.remove('map-dragging');
+      }
+      mapContainerEl.addEventListener('mousedown', (e) => {
+        if (e.button !== 0 || !mapSvgEl) return;
+        mapDragStart = { x: e.clientX, y: e.clientY, panX: mapPanX, panY: mapPanY };
+        mapContainerEl.classList.add('map-dragging');
+      });
+      mapContainerEl.addEventListener('touchstart', (e) => {
+        if (!mapSvgEl || !e.touches.length) return;
+        mapDragStart = { x: e.touches[0].clientX, y: e.touches[0].clientY, panX: mapPanX, panY: mapPanY };
+        mapContainerEl.classList.add('map-dragging');
+      }, { passive: true });
+      document.addEventListener('mousemove', (e) => {
+        if (!mapDragStart) return;
+        e.preventDefault();
+        applyPan(e.clientX, e.clientY);
+      });
+      document.addEventListener('touchmove', (e) => {
+        if (!mapDragStart || !e.touches.length) return;
+        e.preventDefault();
+        applyPan(e.touches[0].clientX, e.touches[0].clientY);
+      }, { passive: false });
+      document.addEventListener('mouseup', endDrag);
+      document.addEventListener('touchend', endDrag);
+      document.addEventListener('touchcancel', endDrag);
+    }
+
+    function closeMapModal() {
+      document.getElementById('mapModalOverlay').classList.remove('open');
+    }
+
+    document.getElementById('mapBtn').addEventListener('click', openMapModal);
+    document.getElementById('mapModalOverlay').addEventListener('click', e => {
+      if (e.target.id === 'mapModalOverlay') closeMapModal();
+    });
+    document.getElementById('mapModal').querySelector('.modal-close').addEventListener('click', closeMapModal);
+
     document.getElementById('itemsListBtn').addEventListener('click', openItemsListModal);
     document.getElementById('itemsListModalOverlay').addEventListener('click', e => {
       if (e.target.id === 'itemsListModalOverlay') closeItemsListModal();
@@ -4321,6 +4831,7 @@
       else if (document.getElementById('jointAssessmentModalOverlay').classList.contains('open')) closeJointAssessmentModal();
       else if (document.getElementById('siphonModalOverlay').classList.contains('open')) closeSiphonModal();
       else if (document.getElementById('emailContentModalOverlay').classList.contains('open')) closeEmailContentModal();
+      else if (document.getElementById('mapModalOverlay').classList.contains('open')) closeMapModal();
       else if (document.getElementById('emailReminderModalOverlay').classList.contains('open')) closeEmailReminderModal();
     });
 
