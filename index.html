@@ -3514,27 +3514,28 @@
       const abilities = agent.arc?.异常?.abilities || [];
       if (abilities.length === 0) return '<div class="ref-item-desc">无</div>';
       return abilities.map(ab => {
+        const practicable = ab.wellKnown != null || ab.已练习 !== undefined;
         const wk = ab.wellKnown || { a: 0, b: 0 };
         const aVal = Math.min(3, Math.max(0, parseInt(wk.a, 10) || 0));
         const bVal = Math.min(3, Math.max(0, parseInt(wk.b, 10) || 0));
-        const wellKnownHtml = `
+        const wellKnownHtml = practicable ? `
           <div class="well-known-track">
             <span class="well-known-intro">为人所知</span>
             <span class="well-known-label">A</span>
             <div class="well-known-boxes">${buildWellKnownBoxes(aVal)}</div>
             <span class="well-known-label">B</span>
             <div class="well-known-boxes">${buildWellKnownBoxes(bVal)}</div>
-          </div>`;
+          </div>` : '';
         return `
         <details class="ref-item">
           <summary>
             <span class="ability-summary-inner">
               <span class="ability-name">${escapeHtml(ab.name || '')}</span>
-              ${ab.已练习 ? '<span class="ability-proficient">(已练习)</span>' : ''}
+              ${practicable && ab.已练习 ? '<span class="ability-proficient">(已练习)</span>' : ''}
             </span>
           </summary>
           <div class="ref-item-desc">${formatDescriptionWithOutcomes(ab.description || '')}</div>
-          <div class="ref-item-desc well-known-wrap">${wellKnownHtml}</div>
+          ${wellKnownHtml ? `<div class="ref-item-desc well-known-wrap">${wellKnownHtml}</div>` : ''}
         </details>
       `;
       }).join('');
