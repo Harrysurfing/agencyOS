@@ -810,7 +810,7 @@
           "关系": [
             {
               "name": "砂糖",
-              "actor": "",
+              "actor": "劳伦斯",
               "description": "经纪人，受伤的前吉他手",
               "benefit": "有影响力",
               "benefitDescription": "每次任务中，你可以告诉这个人一个想法、一种潮流或一个观点，他们会立即通过自己的关系网将其传播出去。此后，除了最离群索居的人以外，你遇到的所有人都会知道这个想法，并已形成自己的看法。",
@@ -819,7 +819,7 @@
             },
             {
               "name": "Aoi",
-              "actor": "",
+              "actor": "哈里",
               "description": "对手，单飞的萨克斯手",
               "benefit": "",
               "benefitDescription": "",
@@ -828,7 +828,7 @@
             },
             {
               "name": "佐佐木",
-              "actor": "",
+              "actor": "小白",
               "description": "钢琴导师，偶像",
               "benefit": "",
               "benefitDescription": "",
