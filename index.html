@@ -3791,7 +3791,7 @@
       const wallTracks = agent.wallTracks || {};
       const 职能 = wallTracks.职能 || { marked: 0, struck: 0 };
       const marked = Math.max(0, parseInt(职能.marked, 10) || 0);
-      const index = marked <= 1 ? 0 : Math.min(1 + Math.floor((marked - 2) / 3), AGENCY_TITLES.length - 1);
+      const index = Math.min(Math.floor(marked / 3), AGENCY_TITLES.length - 1);
       return AGENCY_TITLES[index];
     }
 

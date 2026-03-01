@@ -4,12 +4,12 @@ const API_BASE = (window.location.port === '3001' ? '' : 'http://localhost:3001'
 
 const AGENCY_TITLES = ['见习生', '专员', '高级专员', '助理总监', '总监', '地区总监', '副总裁', '高级副总裁', '执行副总裁', '主席'];
 
-/** 机构头衔 from 职能 track: 0–1 → 见习生 (first 2), then 2–4 → 专员, 5–7 → 高级专员, every 3 blocks → next title. */
+/** 机构头衔 from 职能 track: 0–2 → 见习生, 3–5 → 专员, 6–8 → 高级专员, every 3 marks → next title. */
 function getAgencyTitleFromCompetencyTrack(agent) {
   const wallTracks = agent.wallTracks || {};
   const 职能 = wallTracks.职能 || { marked: 0, struck: 0 };
   const marked = Math.max(0, parseInt(职能.marked, 10) || 0);
-  const index = marked <= 1 ? 0 : Math.min(1 + Math.floor((marked - 2) / 3), AGENCY_TITLES.length - 1);
+  const index = Math.min(Math.floor(marked / 3), AGENCY_TITLES.length - 1);
   return AGENCY_TITLES[index];
 }
 
