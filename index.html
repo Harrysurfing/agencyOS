@@ -752,11 +752,20 @@
       cursor: grabbing;
     }
 
+    .map-container::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle, transparent 60%, rgba(0,0,0,0.5));
+      pointer-events: none;
+      z-index: 2;
+    }
+
     .map-zoom-controls {
       position: absolute;
       top: 0.5rem;
       right: 0.5rem;
-      z-index: 2;
+      z-index: 3;
       display: flex;
       flex-direction: column;
       gap: 0.25rem;
@@ -811,7 +820,11 @@
     }
 
     .map-svg .map-bg {
-      fill: var(--bg-dark);
+      fill: transparent;
+    }
+
+    .map-svg .map-bg-image {
+      pointer-events: none;
     }
 
     .map-svg .map-area {
@@ -821,8 +834,8 @@
 
     .map-svg .map-grid-line {
       stroke: var(--accent-red);
-      stroke-opacity: 0.25;
-      stroke-width: 0.25;
+      stroke-opacity: 0.1;
+      stroke-width: 0.2;
       fill: none;
     }
 
@@ -4562,13 +4575,13 @@
       const areas = data.areas || [];
       const showAllPois = selectedPoiId === 'all';
       const markers = showAllPois ? (data.markers || []) : (selectedPoiId ? (data.markers || []).filter(m => (m.id || '') === selectedPoiId) : []);
-      let svgHtml = '<rect class="map-bg" x="0" y="0" width="100" height="100"/>';
+      let svgHtml = '<image class="map-bg-image" href="assets/citymap.png" x="0" y="0" width="100" height="100" preserveAspectRatio="xMidYMid slice"/><rect class="map-bg" x="0" y="0" width="100" height="100" fill="transparent"/>';
       areas.forEach(area => {
         const bounds = area.boundaries || [];
         const pts = bounds.map(b => Array.isArray(b) ? b.join(',') : `${b.x},${b.y}`);
         if (pts.length < 2) return;
         const points = pts.join(' ');
-        svgHtml += `<polygon class="map-area" points="${points}" fill="${escapeHtml(area.color || '#16181c')}" data-area-name="${escapeHtml(area.name || '')}"/>`;
+        svgHtml += `<polygon class="map-area" points="${points}" fill="${escapeHtml(area.color || 'rgba(22,24,28,0.45)')}" data-area-name="${escapeHtml(area.name || '')}"/>`;
       });
       for (let i = 0; i <= 100; i += 5) {
         svgHtml += `<line class="map-grid-line" x1="${i}" y1="0" x2="${i}" y2="100"/>`;

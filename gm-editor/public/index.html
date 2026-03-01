@@ -475,7 +475,8 @@
         <p class="map-editor-hint">点击下方 100×100 网格选择坐标，然后输入名称并点击「添加」；或点击网格直接添加地点（使用下方名称）。保存后将更新 data/map.json。</p>
         <div class="map-editor-grid-wrap">
           <svg class="map-editor-grid" id="mapEditorGrid" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
-            <rect class="map-editor-bg" width="100" height="100" fill="#1a1c1e"/>
+            <image class="map-editor-bg-image" href="/assets/citymap.png" x="0" y="0" width="100" height="100" preserveAspectRatio="xMidYMid slice"/>
+            <rect class="map-editor-bg" width="100" height="100" fill="transparent"/>
             <g id="mapEditorAreas"></g>
             <g id="mapEditorGridLines"></g>
             <g id="mapEditorSelectionPin"></g>

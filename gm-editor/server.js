@@ -29,7 +29,8 @@ const MIME = {
   '.css': 'text/css',
   '.js': 'application/javascript',
   '.json': 'application/json',
-  '.ico': 'image/x-icon'
+  '.ico': 'image/x-icon',
+  '.png': 'image/png'
 };
 
 async function readBody(req) {
@@ -386,6 +387,30 @@ const server = http.createServer(async (req, res) => {
   if (pathname.startsWith('/api/')) {
     res.writeHead(404, { 'Content-Type': 'application/json', ...CORS });
     res.end(JSON.stringify({ error: 'API not found: ' + pathname }));
+    return;
+  }
+
+  if (pathname.startsWith('/assets/')) {
+    const assetPath = path.join(__dirname, '..', pathname);
+    if (!assetPath.startsWith(path.resolve(__dirname, '..'))) {
+      res.writeHead(403);
+      res.end('Forbidden');
+      return;
+    }
+    try {
+      const data = await fs.readFile(assetPath);
+      const ext = path.extname(assetPath);
+      res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream' });
+      res.end(data);
+    } catch (err) {
+      if (err.code === 'ENOENT') {
+        res.writeHead(404);
+        res.end('Not Found');
+      } else {
+        res.writeHead(500);
+        res.end('Error');
+      }
+    }
     return;
   }
 
