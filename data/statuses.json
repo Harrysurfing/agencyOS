@@ -226,8 +226,8 @@
               "name": "爱丽丝",
               "actor": "弗兰克",
               "description": "一个话唠的前同事，超爱分享她的故事",
-              "benefit": "博学",
-              "benefitDescription": "如果你需要了解一段历史信息或某件机械的运作原理，你可以在任务期间给此人打一次电话，他们总能可靠地给出答案。向他们透露过多信息仍可能制造散逸端。",
+              "benefit": "坚韧",
+              "benefitDescription": "如果这个人在附近，他们能保护平民免于死亡，或为你抵挡一点伤害，总共 3次，之后他们本人就必须撤退恢复。",
               "benefitActive": false,
               "closeness": 4
             },
