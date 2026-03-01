@@ -26,6 +26,7 @@
       <div class="agent-dropdown-panel" id="agentDropdownPanel"></div>
     </div>
     <a href="/missions.html" class="ref-btn" style="text-decoration:none;color:inherit;">任务笔记</a>
+    <button class="ref-btn" id="mapEditorBtn" type="button">地图</button>
     <button class="ref-btn" id="chaosEffectBtn">混沌效应</button>
     <button class="ref-btn" id="secondaryAnomalyBtn">次级异常</button>
     <button class="new-agent-btn" id="newMissionBtn">新建任务报告</button>
@@ -460,6 +461,45 @@
           <textarea id="gmModalLore" placeholder="输入 HTML 内容…" rows="14"></textarea>
         </div>
         <button type="button" class="modal-submit-btn" id="gmInfoSubmit">确认</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="mapEditorModalOverlay">
+    <div class="modal map-editor-modal" id="mapEditorModal">
+      <div class="modal-header">
+        <h3 class="modal-title">地图 POI 编辑</h3>
+        <button class="modal-close" type="button" aria-label="关闭" id="mapEditorClose">×</button>
+      </div>
+      <div class="modal-body map-editor-body">
+        <p class="map-editor-hint">点击下方 100×100 网格选择坐标，然后输入名称并点击「添加」；或点击网格直接添加地点（使用下方名称）。保存后将更新 data/map.json。</p>
+        <div class="map-editor-grid-wrap">
+          <svg class="map-editor-grid" id="mapEditorGrid" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
+            <rect class="map-editor-bg" width="100" height="100" fill="#1a1c1e"/>
+            <g id="mapEditorAreas"></g>
+            <g id="mapEditorGridLines"></g>
+            <g id="mapEditorSelectionPin"></g>
+            <g id="mapEditorPois"></g>
+          </svg>
+        </div>
+        <div class="map-editor-form">
+          <div class="map-editor-field">
+            <label>新地点名称</label>
+            <input type="text" id="mapEditorPoiName" placeholder="地点名称" />
+          </div>
+          <div class="map-editor-field map-editor-coord">
+            <label>坐标 (x, y)</label>
+            <span id="mapEditorCoordDisplay">—</span>
+          </div>
+          <button type="button" class="modal-submit-btn" id="mapEditorAddBtn">添加</button>
+        </div>
+        <div class="map-editor-list-wrap">
+          <h4 class="map-editor-list-title">地点列表</h4>
+          <ul class="map-editor-poi-list" id="mapEditorPoiList"></ul>
+        </div>
+        <div class="map-editor-actions">
+          <button type="button" class="modal-submit-btn" id="mapEditorSaveBtn">保存到 map.json</button>
+        </div>
       </div>
     </div>
   </div>

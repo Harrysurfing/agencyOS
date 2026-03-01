@@ -22,6 +22,7 @@ const ARC_REF_PATH = path.join(DATA_DIR, 'arc-reference.json');
 const ITEMS_PATH = path.join(DATA_DIR, 'items.json');
 const MISSIONS_PATH = path.join(DATA_DIR, 'mission.json');
 const IN_MAIL_PATH = path.join(DATA_DIR, 'inMail.json');
+const MAP_PATH = path.join(DATA_DIR, 'map.json');
 
 const MIME = {
   '.html': 'text/html',
@@ -333,6 +334,48 @@ const server = http.createServer(async (req, res) => {
       await fs.writeFile(ITEMS_PATH, JSON.stringify(data, null, 2), 'utf-8');
       res.writeHead(200, { 'Content-Type': 'application/json', ...CORS });
       res.end(JSON.stringify({ ok: true, item: newItem }));
+    } catch (err) {
+      res.writeHead(500, { 'Content-Type': 'application/json', ...CORS });
+      res.end(JSON.stringify({ error: err.message }));
+    }
+    return;
+  }
+
+  if (pathname === '/api/map' && req.method === 'GET') {
+    try {
+      const data = await fs.readFile(MAP_PATH, 'utf-8');
+      res.writeHead(200, { 'Content-Type': 'application/json', ...CORS });
+      res.end(data);
+    } catch (err) {
+      if (err.code === 'ENOENT') {
+        res.writeHead(200, { 'Content-Type': 'application/json', ...CORS });
+        res.end(JSON.stringify({ title: '三连城', subtitle: '', areas: [], markers: [] }));
+      } else {
+        res.writeHead(500, { 'Content-Type': 'application/json', ...CORS });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    }
+    return;
+  }
+
+  if (pathname === '/api/map' && req.method === 'PUT') {
+    try {
+      const body = await readBody(req);
+      if (!body || !body.trim()) {
+        res.writeHead(400, { 'Content-Type': 'application/json', ...CORS });
+        res.end(JSON.stringify({ error: 'Request body is required' }));
+        return;
+      }
+      const json = JSON.parse(body);
+      if (typeof json !== 'object' || json === null) {
+        res.writeHead(400, { 'Content-Type': 'application/json', ...CORS });
+        res.end(JSON.stringify({ error: 'Invalid JSON structure' }));
+        return;
+      }
+      await fs.mkdir(DATA_DIR, { recursive: true });
+      await fs.writeFile(MAP_PATH, JSON.stringify(json, null, 2), 'utf-8');
+      res.writeHead(200, { 'Content-Type': 'application/json', ...CORS });
+      res.end(JSON.stringify({ ok: true }));
     } catch (err) {
       res.writeHead(500, { 'Content-Type': 'application/json', ...CORS });
       res.end(JSON.stringify({ error: err.message }));

@@ -1592,5 +1592,195 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && document.getElementById('newItemModalOverlay').classList.contains('open')) closeNewItemModal();
 });
 
+// Map editor (POI editing for map.json)
+let mapEditorData = null;
+let mapEditorSelectedCoord = null;
+
+function renderMapEditorAreas() {
+  const g = document.getElementById('mapEditorAreas');
+  if (!g || !mapEditorData || !Array.isArray(mapEditorData.areas)) return;
+  g.innerHTML = mapEditorData.areas.map(area => {
+    const pts = (area.boundaries || []);
+    if (pts.length < 3) return '';
+    const points = pts.map(p => `${Number(p[0]) || 0},${Number(p[1]) || 0}`).join(' ');
+    const color = (area.color || '#333').replace(/"/g, '');
+    return `<polygon class="map-editor-area" points="${points}" fill="${color}" stroke="rgba(255,255,255,0.15)" stroke-width="0.2" data-area-id="${escapeHtml(area.id || '')}" title="${escapeHtml(area.name || area.id || '')}"/>`;
+  }).join('');
+}
+
+function renderMapEditorGridLines() {
+  const g = document.getElementById('mapEditorGridLines');
+  if (!g) return;
+  let html = '';
+  for (let i = 0; i <= 100; i += 5) {
+    html += `<line x1="${i}" y1="0" x2="${i}" y2="100"/>`;
+    html += `<line x1="0" y1="${i}" x2="100" y2="${i}"/>`;
+  }
+  g.innerHTML = html;
+}
+
+function renderMapEditorSelectionPin() {
+  const g = document.getElementById('mapEditorSelectionPin');
+  if (!g) return;
+  if (!mapEditorSelectedCoord) {
+    g.innerHTML = '';
+    return;
+  }
+  const x = mapEditorSelectedCoord.x;
+  const y = mapEditorSelectedCoord.y;
+  g.innerHTML = `<circle class="map-marker-pin map-editor-selection-pin" cx="${x}" cy="${y}" r="1.2"/>`;
+}
+
+function renderMapEditorPois() {
+  const g = document.getElementById('mapEditorPois');
+  if (!g || !mapEditorData || !Array.isArray(mapEditorData.markers)) return;
+  g.innerHTML = mapEditorData.markers.map(m => {
+    const x = Number(m.x) || 0;
+    const y = Number(m.y) || 0;
+    return `<circle class="map-marker-pin" cx="${x}" cy="${y}" r="1.2" data-poi-id="${escapeHtml(m.id || '')}" title="${escapeHtml(m.label || m.id || '')}"/>`;
+  }).join('');
+}
+
+function renderMapEditorPoiList() {
+  const ul = document.getElementById('mapEditorPoiList');
+  if (!ul || !mapEditorData) return;
+  ul.innerHTML = mapEditorData.markers.map((m, i) => `
+    <li class="map-editor-poi-item" data-index="${i}">
+      <input type="text" class="map-editor-poi-label" value="${escapeHtml(m.label || '')}" placeholder="名称" data-index="${i}"/>
+      <span class="map-editor-poi-coord">(${Number(m.x) || 0}, ${Number(m.y) || 0})</span>
+      <button type="button" class="map-editor-poi-delete" data-index="${i}">删除</button>
+    </li>
+  `).join('');
+  ul.querySelectorAll('.map-editor-poi-label').forEach(input => {
+    input.addEventListener('change', function () {
+      const i = parseInt(this.dataset.index, 10);
+      if (mapEditorData.markers[i]) mapEditorData.markers[i].label = this.value.trim() || this.value;
+    });
+  });
+  ul.querySelectorAll('.map-editor-poi-delete').forEach(btn => {
+    btn.addEventListener('click', function () {
+      const i = parseInt(this.dataset.index, 10);
+      mapEditorData.markers.splice(i, 1);
+      renderMapEditorPois();
+      renderMapEditorPoiList();
+    });
+  });
+}
+
+function nextPoiId() {
+  if (!mapEditorData || !Array.isArray(mapEditorData.markers)) return 'poi-1';
+  const ids = mapEditorData.markers.map(m => (m.id || '').replace(/^poi-/, '')).filter(Boolean);
+  const nums = ids.map(s => parseInt(s, 10)).filter(n => !isNaN(n));
+  const next = nums.length ? Math.max(...nums) + 1 : 1;
+  return 'poi-' + next;
+}
+
+async function openMapEditor() {
+  document.getElementById('mapEditorModalOverlay').classList.add('open');
+  mapEditorSelectedCoord = null;
+  document.getElementById('mapEditorCoordDisplay').textContent = '—';
+  document.getElementById('mapEditorPoiName').value = '';
+  try {
+    const res = await fetch(`${API_BASE}/api/map`);
+    const data = res.ok ? await res.json() : { title: '三连城', subtitle: '', areas: [], markers: [] };
+    mapEditorData = {
+      title: data.title || '三连城',
+      subtitle: data.subtitle != null ? data.subtitle : '',
+      areas: Array.isArray(data.areas) ? data.areas : [],
+      markers: Array.isArray(data.markers) ? data.markers.map(m => ({ id: m.id, label: m.label, x: m.x, y: m.y })) : []
+    };
+  } catch (_) {
+    mapEditorData = { title: '三连城', subtitle: '', areas: [], markers: [] };
+  }
+  renderMapEditorAreas();
+  renderMapEditorGridLines();
+  renderMapEditorSelectionPin();
+  renderMapEditorPois();
+  renderMapEditorPoiList();
+}
+
+document.getElementById('mapEditorBtn').addEventListener('click', openMapEditor);
+
+document.getElementById('mapEditorClose').addEventListener('click', () => {
+  document.getElementById('mapEditorModalOverlay').classList.remove('open');
+});
+document.getElementById('mapEditorModalOverlay').addEventListener('click', e => {
+  if (e.target.id === 'mapEditorModalOverlay') document.getElementById('mapEditorModalOverlay').classList.remove('open');
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && document.getElementById('mapEditorModalOverlay').classList.contains('open')) {
+    document.getElementById('mapEditorModalOverlay').classList.remove('open');
+  }
+});
+
+const mapEditorGrid = document.getElementById('mapEditorGrid');
+if (mapEditorGrid) {
+  mapEditorGrid.addEventListener('click', (e) => {
+    if (!mapEditorData) return;
+    const svg = mapEditorGrid;
+    const pt = svg.createSVGPoint();
+    pt.x = e.clientX;
+    pt.y = e.clientY;
+    const svgP = pt.matrixTransform(svg.getScreenCTM().inverse());
+    let x = Math.round(Math.max(0, Math.min(100, svgP.x)));
+    let y = Math.round(Math.max(0, Math.min(100, svgP.y)));
+    mapEditorSelectedCoord = { x, y };
+    document.getElementById('mapEditorCoordDisplay').textContent = `${x}, ${y}`;
+    renderMapEditorSelectionPin();
+    const nameInput = document.getElementById('mapEditorPoiName');
+    const name = (nameInput.value || '').trim();
+    if (name) {
+      const id = nextPoiId();
+      mapEditorData.markers.push({ id, label: name, x, y });
+      nameInput.value = '';
+      renderMapEditorPois();
+      renderMapEditorPoiList();
+    }
+  });
+}
+
+document.getElementById('mapEditorAddBtn').addEventListener('click', () => {
+  if (!mapEditorData || !mapEditorSelectedCoord) {
+    showToast('请先在网格上点击选择坐标');
+    return;
+  }
+  const nameInput = document.getElementById('mapEditorPoiName');
+  const name = (nameInput.value || '').trim();
+  if (!name) {
+    showToast('请输入地点名称');
+    return;
+  }
+  const id = nextPoiId();
+  mapEditorData.markers.push({
+    id,
+    label: name,
+    x: mapEditorSelectedCoord.x,
+    y: mapEditorSelectedCoord.y
+  });
+  nameInput.value = '';
+  renderMapEditorPois();
+  renderMapEditorSelectionPin();
+  renderMapEditorPoiList();
+  showToast('已添加：' + name);
+});
+
+document.getElementById('mapEditorSaveBtn').addEventListener('click', async () => {
+  if (!mapEditorData) return;
+  try {
+    const res = await fetch(`${API_BASE}/api/map`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(mapEditorData)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || res.statusText);
+    }
+    showToast('已保存到 map.json');
+  } catch (err) {
+    showToast('保存失败: ' + (err.message || err));
+  }
+});
+
 setupItemsDelegation();
 load();
