@@ -3690,6 +3690,12 @@
       </div>
       <div class="modal-body map-modal-body">
         <p class="map-modal-subtitle" id="mapModalSubtitle"></p>
+        <div class="map-poi-filter-wrap" id="mapPoiFilterWrap" role="group" aria-label="按类型筛选">
+          <label class="map-poi-filter-option"><input type="checkbox" class="map-poi-filter-check" data-type="地点" checked /><span class="map-poi-filter-dot map-poi-filter-dot--place"></span>地点</label>
+          <label class="map-poi-filter-option"><input type="checkbox" class="map-poi-filter-check" data-type="异常" checked /><span class="map-poi-filter-dot map-poi-filter-dot--anomaly"></span>异常</label>
+          <label class="map-poi-filter-option"><input type="checkbox" class="map-poi-filter-check" data-type="事件" checked /><span class="map-poi-filter-dot map-poi-filter-dot--event"></span>事件</label>
+          <label class="map-poi-filter-option"><input type="checkbox" class="map-poi-filter-check" data-type="人物" checked /><span class="map-poi-filter-dot map-poi-filter-dot--person"></span>人物</label>
+        </div>
         <div class="map-poi-select-wrap">
           <label class="map-poi-select-label">选择图例</label>
           <div class="map-poi-custom-wrap">
@@ -3699,12 +3705,6 @@
             </button>
             <div class="map-poi-dropdown" id="mapPoiDropdown" role="listbox" aria-hidden="true"></div>
           </div>
-        </div>
-        <div class="map-poi-filter-wrap" id="mapPoiFilterWrap" role="group" aria-label="按类型筛选">
-          <label class="map-poi-filter-option"><input type="checkbox" class="map-poi-filter-check" data-type="地点" checked /><span class="map-poi-filter-dot map-poi-filter-dot--place"></span>地点</label>
-          <label class="map-poi-filter-option"><input type="checkbox" class="map-poi-filter-check" data-type="异常" checked /><span class="map-poi-filter-dot map-poi-filter-dot--anomaly"></span>异常</label>
-          <label class="map-poi-filter-option"><input type="checkbox" class="map-poi-filter-check" data-type="事件" checked /><span class="map-poi-filter-dot map-poi-filter-dot--event"></span>事件</label>
-          <label class="map-poi-filter-option"><input type="checkbox" class="map-poi-filter-check" data-type="人物" checked /><span class="map-poi-filter-dot map-poi-filter-dot--person"></span>人物</label>
         </div>
         <div class="map-poi-description-wrap" id="mapPoiDescriptionWrap" style="display: none;">
           <p class="map-poi-description" id="mapPoiDescription"></p>
@@ -4645,14 +4645,33 @@
     let mapDataCache = null;
     let mapSelectedPoiId = '';
     let mapPoiTypeFilters = { '地点': true, '异常': true, '事件': true, '人物': true };
+    const MAP_POI_TYPES = ['地点', '异常', '事件', '人物'];
+
+    function getAllMarkersFromPois(data) {
+      if (!data || !data.pois || typeof data.pois !== 'object') return [];
+      const list = [];
+      MAP_POI_TYPES.forEach(function(t) {
+        (data.pois[t] || []).forEach(function(m) {
+          list.push({ id: m.id, label: m.label, x: m.x, y: m.y, description: m.description || '', type: t });
+        });
+      });
+      return list;
+    }
 
     function renderMapContent(data, selectedPoiId) {
       const svgEl = document.getElementById('mapSvg');
       if (!svgEl || !data) return;
       const areas = data.areas || [];
-      const showAllPois = selectedPoiId === 'all';
-      let markers = showAllPois ? (data.markers || []) : (selectedPoiId ? (data.markers || []).filter(m => (m.id || '') === selectedPoiId) : []);
-      if (showAllPois) markers = markers.filter(m => mapPoiTypeFilters[m.type || '地点']);
+      const allMarkers = getAllMarkersFromPois(data);
+      const filteredMarkers = allMarkers.filter(function(m) { return mapPoiTypeFilters[m.type || '地点']; });
+      let markers;
+      if (selectedPoiId === '') {
+        markers = [];
+      } else if (selectedPoiId === 'all') {
+        markers = filteredMarkers;
+      } else {
+        markers = filteredMarkers.filter(function(m) { return (m.id || '') === selectedPoiId; });
+      }
       let svgHtml = '<image class="map-bg-image" href="assets/citymap.png" x="0" y="0" width="100" height="100" preserveAspectRatio="xMidYMid slice"/><rect class="map-bg" x="0" y="0" width="100" height="100" fill="transparent"/>';
       areas.forEach(area => {
         const bounds = area.boundaries || [];
@@ -4673,13 +4692,13 @@
       });
       const PIN_OFFSET = 2;
       const POI_PIN_CLASS = { '地点': 'place', '异常': 'anomaly', '事件': 'event', '人物': 'person' };
-      markers.forEach(m => {
+      markers.forEach(function(m) {
         const cx = Number(m.x) || 0;
         const cy = Number(m.y) || 0;
         const label = m.label || '';
         const type = m.type || '地点';
         const typeClass = 'map-marker-pin--' + (POI_PIN_CLASS[type] || 'place');
-        const isSelected = !!selectedPoiId && !showAllPois;
+        const isSelected = !!(selectedPoiId && (m.id || '') === selectedPoiId);
         const wrapClass = 'map-marker-wrap' + (isSelected ? ' map-marker-selected' : '');
         const rippleHtml = isSelected ? `<g transform="translate(${cx},${cy})"><circle class="map-marker-ripple" cx="0" cy="0" r="3.2"><animateTransform attributeName="transform" type="scale" from="0.3" to="1" dur="1.8s" repeatCount="indefinite" additive="replace"/><animate attributeName="stroke-opacity" from="0.8" to="0" dur="1.8s" repeatCount="indefinite"/></circle><circle class="map-marker-ripple map-marker-ripple-2" cx="0" cy="0" r="3.2"><animateTransform attributeName="transform" type="scale" from="0.3" to="1" dur="1.8s" repeatCount="indefinite" additive="replace" begin="0.9s"/><animate attributeName="stroke-opacity" from="0.8" to="0" dur="1.8s" repeatCount="indefinite" begin="0.9s"/></circle></g>` : '';
         svgHtml += `<g class="${wrapClass}" title="${escapeHtml(label)}">${rippleHtml}<circle class="map-marker-pin ${typeClass}" cx="${cx}" cy="${cy}" r="0.9"/></g>`;
@@ -4690,22 +4709,16 @@
       updateMapPoiDescription(data, selectedPoiId);
     }
 
-    function updateMapPoiFilterVisibility(selectedPoiId) {
-      const wrap = document.getElementById('mapPoiFilterWrap');
-      if (!wrap) return;
-      wrap.style.display = selectedPoiId === 'all' ? '' : 'none';
-    }
-
     function updateMapPoiDescription(data, selectedPoiId) {
       const wrap = document.getElementById('mapPoiDescriptionWrap');
       const el = document.getElementById('mapPoiDescription');
       if (!wrap || !el) return;
-      const showSingle = selectedPoiId && selectedPoiId !== 'all';
-      if (!showSingle || !data || !data.markers) {
+      if (!selectedPoiId || selectedPoiId === 'all' || !data) {
         wrap.style.display = 'none';
         return;
       }
-      const marker = (data.markers || []).find(m => (m.id || '') === selectedPoiId);
+      const allMarkers = getAllMarkersFromPois(data);
+      const marker = allMarkers.find(function(m) { return (m.id || '') === selectedPoiId; });
       const desc = marker && (marker.description || '').trim();
       if (desc) {
         el.textContent = desc;
@@ -4731,6 +4744,37 @@
       svgEl.setAttribute('viewBox', `${minX} ${minY} ${w} ${h}`);
     }
 
+    function updateMapPoiDropdown() {
+      const dropdownEl = document.getElementById('mapPoiDropdown');
+      const valueEl = document.getElementById('mapPoiSelectValue');
+      const triggerEl = document.getElementById('mapPoiSelectTrigger');
+      if (!dropdownEl || !valueEl || !triggerEl || !mapDataCache || !mapDataCache.pois) return;
+      const list = [];
+      MAP_POI_TYPES.forEach(function(t) {
+        if (mapPoiTypeFilters[t]) (mapDataCache.pois[t] || []).forEach(function(m) { list.push(m); });
+      });
+      let html = '<button type="button" class="map-poi-option" data-value="" role="option">—</button><button type="button" class="map-poi-option" data-value="all" role="option">全部</button>';
+      list.forEach(function(m) {
+        const id = m.id || '';
+        const label = escapeHtml(m.label || id);
+        html += '<button type="button" class="map-poi-option" data-value="' + escapeHtml(id) + '" role="option">' + label + '</button>';
+      });
+      dropdownEl.innerHTML = html;
+      if (mapSelectedPoiId === 'all') valueEl.textContent = '全部';
+      else if (mapSelectedPoiId === '') valueEl.textContent = '—';
+      else {
+        var found = list.find(function(m) { return (m.id || '') === mapSelectedPoiId; });
+        valueEl.textContent = found ? (found.label || '—') : '—';
+      }
+      dropdownEl.querySelectorAll('.map-poi-option').forEach(function(o) {
+        var v = o.getAttribute('data-value') || '';
+        if (v === mapSelectedPoiId) o.classList.add('selected'); else o.classList.remove('selected');
+      });
+      dropdownEl.classList.remove('open');
+      dropdownEl.setAttribute('aria-hidden', 'true');
+      triggerEl.setAttribute('aria-expanded', 'false');
+    }
+
     function openMapModal() {
       const overlay = document.getElementById('mapModalOverlay');
       const titleEl = document.getElementById('mapModalTitle');
@@ -4741,32 +4785,22 @@
       loadingEl.style.display = 'flex';
       svgEl.style.display = 'none';
       fetchJSON('map.json')
-        .then(data => {
+        .then(function(data) {
           mapDataCache = data;
           mapZoom = 1;
           mapPanX = 0;
           mapPanY = 0;
-          const defaultId = 'all';
-          mapSelectedPoiId = defaultId;
-          titleEl.textContent = data.title || '三联城';
+          mapPoiTypeFilters = { '地点': true, '异常': true, '事件': true, '人物': true };
+          document.querySelectorAll('.map-poi-filter-check').forEach(function(cb) {
+            var t = cb.getAttribute('data-type');
+            if (t && mapPoiTypeFilters.hasOwnProperty(t)) cb.checked = mapPoiTypeFilters[t];
+          });
+          mapSelectedPoiId = 'all';
+          titleEl.textContent = data.title || '三连城';
           subtitleEl.textContent = data.subtitle || '';
           subtitleEl.style.display = data.subtitle ? 'block' : 'none';
-          const dropdownEl = document.getElementById('mapPoiDropdown');
-          const valueEl = document.getElementById('mapPoiSelectValue');
-          const triggerEl = document.getElementById('mapPoiSelectTrigger');
-          if (dropdownEl && valueEl && triggerEl) {
-            dropdownEl.innerHTML = '<button type="button" class="map-poi-option" data-value="" role="option">—</button><button type="button" class="map-poi-option selected" data-value="all" role="option">全部</button>' + (data.markers || []).map(m => {
-              const id = m.id || '';
-              const label = escapeHtml(m.label || id);
-              return `<button type="button" class="map-poi-option" data-value="${escapeHtml(id)}" role="option">${label}</button>`;
-            }).join('');
-            valueEl.textContent = '全部';
-            dropdownEl.classList.remove('open');
-            dropdownEl.setAttribute('aria-hidden', 'true');
-            triggerEl.setAttribute('aria-expanded', 'false');
-          }
-          renderMapContent(data, defaultId);
-          updateMapPoiFilterVisibility(defaultId);
+          updateMapPoiDropdown();
+          renderMapContent(data, 'all');
           loadingEl.style.display = 'none';
           svgEl.style.display = 'block';
         })
@@ -4798,7 +4832,6 @@
         mapPoiDropdown.setAttribute('aria-hidden', 'true');
         mapPoiTrigger.setAttribute('aria-expanded', 'false');
         if (mapDataCache) renderMapContent(mapDataCache, mapSelectedPoiId);
-        updateMapPoiFilterVisibility(val);
       });
       document.addEventListener('click', () => {
         mapPoiDropdown.classList.remove('open');
@@ -4807,11 +4840,12 @@
       });
     }
 
-    document.querySelectorAll('.map-poi-filter-check').forEach(cb => {
-      cb.addEventListener('change', () => {
-        const type = cb.getAttribute('data-type') || '';
+    document.querySelectorAll('.map-poi-filter-check').forEach(function(cb) {
+      cb.addEventListener('change', function() {
+        var type = this.getAttribute('data-type') || '';
         if (type && mapPoiTypeFilters.hasOwnProperty(type)) {
-          mapPoiTypeFilters[type] = cb.checked;
+          mapPoiTypeFilters[type] = this.checked;
+          updateMapPoiDropdown();
           if (mapDataCache) renderMapContent(mapDataCache, mapSelectedPoiId);
         }
       });
