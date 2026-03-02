@@ -720,6 +720,56 @@
       color: var(--accent-red);
     }
 
+    .map-poi-filter-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .map-poi-filter-option {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.9rem;
+      color: var(--text-primary);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .map-poi-filter-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .map-poi-filter-dot--place { background: var(--accent-red, #c41e3a); }
+    .map-poi-filter-dot--anomaly { background: #4a7cba; }
+    .map-poi-filter-dot--event { background: #c9a227; }
+    .map-poi-filter-dot--person { background: #3a8f5c; }
+
+    .map-poi-filter-option:has(input:disabled) .map-poi-filter-dot {
+      opacity: 0.4;
+    }
+
+    .map-poi-description-wrap {
+      margin-bottom: 0.75rem;
+      padding: 0.6rem 0.75rem;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    .map-poi-description {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
     @media (max-width: 768px) {
       .map-poi-select-wrap {
         flex-wrap: wrap;
@@ -858,7 +908,23 @@
     .map-svg .map-marker-pin {
       fill: var(--accent-red);
       stroke: var(--bg-dark);
-      stroke-width: 0.35;
+      stroke-width: 0.28;
+    }
+
+    .map-svg .map-marker-pin--place {
+      fill: var(--accent-red);
+    }
+
+    .map-svg .map-marker-pin--anomaly {
+      fill: #4a7cba;
+    }
+
+    .map-svg .map-marker-pin--event {
+      fill: #c9a227;
+    }
+
+    .map-svg .map-marker-pin--person {
+      fill: #3a8f5c;
     }
 
     .map-svg .map-marker-ripple {
@@ -3623,14 +3689,23 @@
       <div class="modal-body map-modal-body">
         <p class="map-modal-subtitle" id="mapModalSubtitle"></p>
         <div class="map-poi-select-wrap">
-          <label class="map-poi-select-label">显示地点</label>
+          <label class="map-poi-select-label">选择图例</label>
           <div class="map-poi-custom-wrap">
-            <button type="button" class="map-poi-select-trigger" id="mapPoiSelectTrigger" aria-haspopup="listbox" aria-expanded="false" aria-label="选择要显示的地点">
+            <button type="button" class="map-poi-select-trigger" id="mapPoiSelectTrigger" aria-haspopup="listbox" aria-expanded="false" aria-label="选择图例">
               <span class="map-poi-select-value" id="mapPoiSelectValue">—</span>
               <span class="map-poi-select-chevron" aria-hidden="true">▾</span>
             </button>
             <div class="map-poi-dropdown" id="mapPoiDropdown" role="listbox" aria-hidden="true"></div>
           </div>
+        </div>
+        <div class="map-poi-filter-wrap" id="mapPoiFilterWrap" role="group" aria-label="按类型筛选">
+          <label class="map-poi-filter-option"><input type="checkbox" class="map-poi-filter-check" data-type="地点" checked /><span class="map-poi-filter-dot map-poi-filter-dot--place"></span>地点</label>
+          <label class="map-poi-filter-option"><input type="checkbox" class="map-poi-filter-check" data-type="异常" checked /><span class="map-poi-filter-dot map-poi-filter-dot--anomaly"></span>异常</label>
+          <label class="map-poi-filter-option"><input type="checkbox" class="map-poi-filter-check" data-type="事件" checked /><span class="map-poi-filter-dot map-poi-filter-dot--event"></span>事件</label>
+          <label class="map-poi-filter-option"><input type="checkbox" class="map-poi-filter-check" data-type="人物" checked /><span class="map-poi-filter-dot map-poi-filter-dot--person"></span>人物</label>
+        </div>
+        <div class="map-poi-description-wrap" id="mapPoiDescriptionWrap" style="display: none;">
+          <p class="map-poi-description" id="mapPoiDescription"></p>
         </div>
         <div class="map-container" id="mapContainer">
           <div class="items-list-loading" id="mapLoading">加载中…</div>
@@ -4567,13 +4642,15 @@
 
     let mapDataCache = null;
     let mapSelectedPoiId = '';
+    let mapPoiTypeFilters = { '地点': true, '异常': true, '事件': true, '人物': true };
 
     function renderMapContent(data, selectedPoiId) {
       const svgEl = document.getElementById('mapSvg');
       if (!svgEl || !data) return;
       const areas = data.areas || [];
       const showAllPois = selectedPoiId === 'all';
-      const markers = showAllPois ? (data.markers || []) : (selectedPoiId ? (data.markers || []).filter(m => (m.id || '') === selectedPoiId) : []);
+      let markers = showAllPois ? (data.markers || []) : (selectedPoiId ? (data.markers || []).filter(m => (m.id || '') === selectedPoiId) : []);
+      if (showAllPois) markers = markers.filter(m => mapPoiTypeFilters[m.type || '地点']);
       let svgHtml = '<image class="map-bg-image" href="assets/citymap.png" x="0" y="0" width="100" height="100" preserveAspectRatio="xMidYMid slice"/><rect class="map-bg" x="0" y="0" width="100" height="100" fill="transparent"/>';
       areas.forEach(area => {
         const bounds = area.boundaries || [];
@@ -4593,18 +4670,47 @@
         svgHtml += `<text class="map-area-label" x="${cen.x}" y="${cen.y}">${escapeHtml(area.name || '')}</text>`;
       });
       const PIN_OFFSET = 2;
+      const POI_PIN_CLASS = { '地点': 'place', '异常': 'anomaly', '事件': 'event', '人物': 'person' };
       markers.forEach(m => {
         const cx = Number(m.x) || 0;
         const cy = Number(m.y) || 0;
         const label = m.label || '';
+        const type = m.type || '地点';
+        const typeClass = 'map-marker-pin--' + (POI_PIN_CLASS[type] || 'place');
         const isSelected = !!selectedPoiId && !showAllPois;
         const wrapClass = 'map-marker-wrap' + (isSelected ? ' map-marker-selected' : '');
-        const rippleHtml = isSelected ? `<g transform="translate(${cx},${cy})"><circle class="map-marker-ripple" cx="0" cy="0" r="4"><animateTransform attributeName="transform" type="scale" from="0.3" to="1" dur="1.8s" repeatCount="indefinite" additive="replace"/><animate attributeName="stroke-opacity" from="0.8" to="0" dur="1.8s" repeatCount="indefinite"/></circle><circle class="map-marker-ripple map-marker-ripple-2" cx="0" cy="0" r="4"><animateTransform attributeName="transform" type="scale" from="0.3" to="1" dur="1.8s" repeatCount="indefinite" additive="replace" begin="0.9s"/><animate attributeName="stroke-opacity" from="0.8" to="0" dur="1.8s" repeatCount="indefinite" begin="0.9s"/></circle></g>` : '';
-        svgHtml += `<g class="${wrapClass}" title="${escapeHtml(label)}">${rippleHtml}<circle class="map-marker-pin" cx="${cx}" cy="${cy}" r="1.2"/></g>`;
+        const rippleHtml = isSelected ? `<g transform="translate(${cx},${cy})"><circle class="map-marker-ripple" cx="0" cy="0" r="3.2"><animateTransform attributeName="transform" type="scale" from="0.3" to="1" dur="1.8s" repeatCount="indefinite" additive="replace"/><animate attributeName="stroke-opacity" from="0.8" to="0" dur="1.8s" repeatCount="indefinite"/></circle><circle class="map-marker-ripple map-marker-ripple-2" cx="0" cy="0" r="3.2"><animateTransform attributeName="transform" type="scale" from="0.3" to="1" dur="1.8s" repeatCount="indefinite" additive="replace" begin="0.9s"/><animate attributeName="stroke-opacity" from="0.8" to="0" dur="1.8s" repeatCount="indefinite" begin="0.9s"/></circle></g>` : '';
+        svgHtml += `<g class="${wrapClass}" title="${escapeHtml(label)}">${rippleHtml}<circle class="map-marker-pin ${typeClass}" cx="${cx}" cy="${cy}" r="0.9"/></g>`;
         if (label) svgHtml += `<text class="map-marker-label" x="${cx}" y="${cy + PIN_OFFSET + 2.5}">${escapeHtml(label)}</text>`;
       });
       svgEl.innerHTML = svgHtml;
       updateMapViewBox();
+      updateMapPoiDescription(data, selectedPoiId);
+    }
+
+    function updateMapPoiFilterVisibility(selectedPoiId) {
+      const wrap = document.getElementById('mapPoiFilterWrap');
+      if (!wrap) return;
+      wrap.style.display = selectedPoiId === 'all' ? '' : 'none';
+    }
+
+    function updateMapPoiDescription(data, selectedPoiId) {
+      const wrap = document.getElementById('mapPoiDescriptionWrap');
+      const el = document.getElementById('mapPoiDescription');
+      if (!wrap || !el) return;
+      const showSingle = selectedPoiId && selectedPoiId !== 'all';
+      if (!showSingle || !data || !data.markers) {
+        wrap.style.display = 'none';
+        return;
+      }
+      const marker = (data.markers || []).find(m => (m.id || '') === selectedPoiId);
+      const desc = marker && (marker.description || '').trim();
+      if (desc) {
+        el.textContent = desc;
+        wrap.style.display = 'block';
+      } else {
+        wrap.style.display = 'none';
+      }
     }
 
     let mapZoom = 1;
@@ -4638,8 +4744,7 @@
           mapZoom = 1;
           mapPanX = 0;
           mapPanY = 0;
-          const hqMarker = (data.markers || []).find(m => (m.label || '') === '机构总部');
-          const defaultId = hqMarker ? (hqMarker.id || '') : '';
+          const defaultId = 'all';
           mapSelectedPoiId = defaultId;
           titleEl.textContent = data.title || '三连城';
           subtitleEl.textContent = data.subtitle || '';
@@ -4648,19 +4753,18 @@
           const valueEl = document.getElementById('mapPoiSelectValue');
           const triggerEl = document.getElementById('mapPoiSelectTrigger');
           if (dropdownEl && valueEl && triggerEl) {
-            dropdownEl.innerHTML = '<button type="button" class="map-poi-option" data-value="" role="option">—</button><button type="button" class="map-poi-option" data-value="all" role="option">全部</button>' + (data.markers || []).map(m => {
+            dropdownEl.innerHTML = '<button type="button" class="map-poi-option" data-value="" role="option">—</button><button type="button" class="map-poi-option selected" data-value="all" role="option">全部</button>' + (data.markers || []).map(m => {
               const id = m.id || '';
               const label = escapeHtml(m.label || id);
-              const sel = id === defaultId ? ' selected' : '';
-              return `<button type="button" class="map-poi-option${sel}" data-value="${escapeHtml(id)}" role="option">${label}</button>`;
+              return `<button type="button" class="map-poi-option" data-value="${escapeHtml(id)}" role="option">${label}</button>`;
             }).join('');
-            const defaultMarker = (data.markers || []).find(m => (m.id || '') === defaultId);
-            valueEl.textContent = defaultMarker ? (defaultMarker.label || '机构总部') : (defaultId ? '机构总部' : '—');
+            valueEl.textContent = '全部';
             dropdownEl.classList.remove('open');
             dropdownEl.setAttribute('aria-hidden', 'true');
             triggerEl.setAttribute('aria-expanded', 'false');
           }
           renderMapContent(data, defaultId);
+          updateMapPoiFilterVisibility(defaultId);
           loadingEl.style.display = 'none';
           svgEl.style.display = 'block';
         })
@@ -4692,6 +4796,7 @@
         mapPoiDropdown.setAttribute('aria-hidden', 'true');
         mapPoiTrigger.setAttribute('aria-expanded', 'false');
         if (mapDataCache) renderMapContent(mapDataCache, mapSelectedPoiId);
+        updateMapPoiFilterVisibility(val);
       });
       document.addEventListener('click', () => {
         mapPoiDropdown.classList.remove('open');
@@ -4699,6 +4804,16 @@
         mapPoiTrigger.setAttribute('aria-expanded', 'false');
       });
     }
+
+    document.querySelectorAll('.map-poi-filter-check').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const type = cb.getAttribute('data-type') || '';
+        if (type && mapPoiTypeFilters.hasOwnProperty(type)) {
+          mapPoiTypeFilters[type] = cb.checked;
+          if (mapDataCache) renderMapContent(mapDataCache, mapSelectedPoiId);
+        }
+      });
+    });
 
     document.getElementById('mapZoomIn')?.addEventListener('click', () => {
       if (mapZoom >= MAP_ZOOM_MAX) return;

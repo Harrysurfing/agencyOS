@@ -1593,8 +1593,15 @@ document.addEventListener('keydown', e => {
 });
 
 // Map editor (POI editing for map.json)
+const POI_TYPE_CLASS = { '地点': 'place', '异常': 'anomaly', '事件': 'event', '人物': 'person' };
+const POI_TYPES = ['地点', '异常', '事件', '人物'];
 let mapEditorData = null;
 let mapEditorSelectedCoord = null;
+
+function getMapEditorSelectedPoiType() {
+  const radio = document.querySelector('input[name="mapEditorPoiType"]:checked');
+  return (radio && POI_TYPES.includes(radio.value)) ? radio.value : '地点';
+}
 
 function renderMapEditorAreas() {
   const g = document.getElementById('mapEditorAreas');
@@ -1628,7 +1635,9 @@ function renderMapEditorSelectionPin() {
   }
   const x = mapEditorSelectedCoord.x;
   const y = mapEditorSelectedCoord.y;
-  g.innerHTML = `<circle class="map-marker-pin map-editor-selection-pin" cx="${x}" cy="${y}" r="1.2"/>`;
+  const type = getMapEditorSelectedPoiType();
+  const typeClass = 'map-marker-pin--' + (POI_TYPE_CLASS[type] || 'place');
+  g.innerHTML = `<circle class="map-marker-pin map-editor-selection-pin ${typeClass}" cx="${x}" cy="${y}" r="0.9"/>`;
 }
 
 function renderMapEditorPois() {
@@ -1637,24 +1646,38 @@ function renderMapEditorPois() {
   g.innerHTML = mapEditorData.markers.map(m => {
     const x = Number(m.x) || 0;
     const y = Number(m.y) || 0;
-    return `<circle class="map-marker-pin" cx="${x}" cy="${y}" r="1.2" data-poi-id="${escapeHtml(m.id || '')}" title="${escapeHtml(m.label || m.id || '')}"/>`;
+    const type = m.type || '地点';
+    const typeClass = 'map-marker-pin--' + (POI_TYPE_CLASS[type] || 'place');
+    return `<circle class="map-marker-pin ${typeClass}" cx="${x}" cy="${y}" r="0.9" data-poi-id="${escapeHtml(m.id || '')}" title="${escapeHtml(m.label || m.id || '')}"/>`;
   }).join('');
 }
 
 function renderMapEditorPoiList() {
   const ul = document.getElementById('mapEditorPoiList');
   if (!ul || !mapEditorData) return;
-  ul.innerHTML = mapEditorData.markers.map((m, i) => `
+  ul.innerHTML = mapEditorData.markers.map((m, i) => {
+    const type = m.type || '地点';
+    const typeClass = 'map-editor-poi-dot--' + (POI_TYPE_CLASS[type] || 'place');
+    return `
     <li class="map-editor-poi-item" data-index="${i}">
+      <span class="map-editor-poi-dot ${typeClass}" title="${escapeHtml(type)}" aria-hidden="true"></span>
       <input type="text" class="map-editor-poi-label" value="${escapeHtml(m.label || '')}" placeholder="名称" data-index="${i}"/>
       <span class="map-editor-poi-coord">(${Number(m.x) || 0}, ${Number(m.y) || 0})</span>
+      <input type="text" class="map-editor-poi-desc" value="${escapeHtml(m.description || '')}" placeholder="描述" data-index="${i}" title="描述（选中该 POI 时在地图上显示）"/>
       <button type="button" class="map-editor-poi-delete" data-index="${i}">删除</button>
     </li>
-  `).join('');
+  `;
+  }).join('');
   ul.querySelectorAll('.map-editor-poi-label').forEach(input => {
     input.addEventListener('change', function () {
       const i = parseInt(this.dataset.index, 10);
       if (mapEditorData.markers[i]) mapEditorData.markers[i].label = this.value.trim() || this.value;
+    });
+  });
+  ul.querySelectorAll('.map-editor-poi-desc').forEach(input => {
+    input.addEventListener('change', function () {
+      const i = parseInt(this.dataset.index, 10);
+      if (mapEditorData.markers[i]) mapEditorData.markers[i].description = this.value.trim() || '';
     });
   });
   ul.querySelectorAll('.map-editor-poi-delete').forEach(btn => {
@@ -1680,6 +1703,7 @@ async function openMapEditor() {
   mapEditorSelectedCoord = null;
   document.getElementById('mapEditorCoordDisplay').textContent = '—';
   document.getElementById('mapEditorPoiName').value = '';
+  document.getElementById('mapEditorPoiDesc').value = '';
   try {
     const res = await fetch(`${API_BASE}/api/map`);
     const data = res.ok ? await res.json() : { title: '三连城', subtitle: '', areas: [], markers: [] };
@@ -1687,7 +1711,7 @@ async function openMapEditor() {
       title: data.title || '三连城',
       subtitle: data.subtitle != null ? data.subtitle : '',
       areas: Array.isArray(data.areas) ? data.areas : [],
-      markers: Array.isArray(data.markers) ? data.markers.map(m => ({ id: m.id, label: m.label, x: m.x, y: m.y })) : []
+      markers: Array.isArray(data.markers) ? data.markers.map(m => ({ id: m.id, label: m.label, x: m.x, y: m.y, type: m.type || '地点', description: m.description || '' })) : []
     };
   } catch (_) {
     mapEditorData = { title: '三连城', subtitle: '', areas: [], markers: [] };
@@ -1727,17 +1751,12 @@ if (mapEditorGrid) {
     mapEditorSelectedCoord = { x, y };
     document.getElementById('mapEditorCoordDisplay').textContent = `${x}, ${y}`;
     renderMapEditorSelectionPin();
-    const nameInput = document.getElementById('mapEditorPoiName');
-    const name = (nameInput.value || '').trim();
-    if (name) {
-      const id = nextPoiId();
-      mapEditorData.markers.push({ id, label: name, x, y });
-      nameInput.value = '';
-      renderMapEditorPois();
-      renderMapEditorPoiList();
-    }
   });
 }
+
+document.querySelectorAll('input[name="mapEditorPoiType"]').forEach(radio => {
+  radio.addEventListener('change', () => { renderMapEditorSelectionPin(); });
+});
 
 document.getElementById('mapEditorAddBtn').addEventListener('click', () => {
   if (!mapEditorData || !mapEditorSelectedCoord) {
@@ -1745,19 +1764,25 @@ document.getElementById('mapEditorAddBtn').addEventListener('click', () => {
     return;
   }
   const nameInput = document.getElementById('mapEditorPoiName');
+  const descInput = document.getElementById('mapEditorPoiDesc');
   const name = (nameInput.value || '').trim();
   if (!name) {
     showToast('请输入地点名称');
     return;
   }
+  const description = (descInput && (descInput.value || '').trim()) || '';
   const id = nextPoiId();
+  const type = getMapEditorSelectedPoiType();
   mapEditorData.markers.push({
     id,
     label: name,
     x: mapEditorSelectedCoord.x,
-    y: mapEditorSelectedCoord.y
+    y: mapEditorSelectedCoord.y,
+    type,
+    description
   });
   nameInput.value = '';
+  if (descInput) descInput.value = '';
   renderMapEditorPois();
   renderMapEditorSelectionPin();
   renderMapEditorPoiList();

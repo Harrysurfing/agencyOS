@@ -488,6 +488,19 @@
             <label>新地点名称</label>
             <input type="text" id="mapEditorPoiName" placeholder="地点名称" />
           </div>
+          <div class="map-editor-field">
+            <label>描述</label>
+            <input type="text" id="mapEditorPoiDesc" placeholder="描述（可选）" />
+          </div>
+          <div class="map-editor-field map-editor-poi-type">
+            <label>类型</label>
+            <div class="map-editor-poi-type-options" role="group" aria-label="POI 类型">
+              <label class="map-editor-poi-type-option">地点<input type="radio" name="mapEditorPoiType" value="地点" checked /></label>
+              <label class="map-editor-poi-type-option">异常<input type="radio" name="mapEditorPoiType" value="异常" /></label>
+              <label class="map-editor-poi-type-option">事件<input type="radio" name="mapEditorPoiType" value="事件" /></label>
+              <label class="map-editor-poi-type-option">人物<input type="radio" name="mapEditorPoiType" value="人物" /></label>
+            </div>
+          </div>
           <div class="map-editor-field map-editor-coord">
             <label>坐标 (x, y)</label>
             <span id="mapEditorCoordDisplay">—</span>

@@ -1922,6 +1922,13 @@ body > * {
   color: var(--text-secondary);
   font-size: 0.85rem;
   white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.map-editor-poi-desc {
+  flex: 1;
+  min-width: 80px;
+  font-size: 0.85rem;
 }
 
 .map-editor-poi-delete {
@@ -1944,13 +1951,88 @@ body > * {
 }
 
 .map-editor-modal .map-marker-pin {
-  fill: var(--arc-anomaly);
-  stroke: rgba(255, 255, 255, 0.4);
+  stroke: rgba(255, 255, 255, 0.5);
   stroke-width: 0.2;
 }
 
+.map-editor-modal .map-marker-pin--place {
+  fill: var(--accent-red, #c41e3a);
+}
+
+.map-editor-modal .map-marker-pin--anomaly {
+  fill: #4a7cba;
+}
+
+.map-editor-modal .map-marker-pin--event {
+  fill: #c9a227;
+}
+
+.map-editor-modal .map-marker-pin--person {
+  fill: #3a8f5c;
+}
+
 .map-editor-modal .map-editor-selection-pin {
-  fill: var(--accent-red);
   stroke: rgba(255, 255, 255, 0.7);
   stroke-width: 0.25;
+}
+
+.map-editor-poi-type {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.map-editor-poi-type > label {
+  margin-bottom: 0;
+  flex-shrink: 0;
+}
+
+.map-editor-poi-type-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.5rem;
+  align-items: center;
+  min-width: 0;
+}
+
+.map-editor-poi-type-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.map-editor-poi-type-option input[type="radio"] {
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+.map-editor-poi-dot {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.map-editor-poi-dot--place {
+  background: var(--accent-red, #c41e3a);
+}
+
+.map-editor-poi-dot--anomaly {
+  background: #4a7cba;
+}
+
+.map-editor-poi-dot--event {
+  background: #c9a227;
+}
+
+.map-editor-poi-dot--person {
+  background: #3a8f5c;
 }
