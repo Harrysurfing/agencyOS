@@ -1604,7 +1604,7 @@ function renderMapEditorAreas() {
     if (pts.length < 3) return '';
     const points = pts.map(p => `${Number(p[0]) || 0},${Number(p[1]) || 0}`).join(' ');
     const color = (area.color || '#333').replace(/"/g, '');
-    return `<polygon class="map-editor-area" points="${points}" fill="${color}" stroke="rgba(255,255,255,0.15)" stroke-width="0.2" data-area-id="${escapeHtml(area.id || '')}" title="${escapeHtml(area.name || area.id || '')}"/>`;
+    return `<polygon class="map-editor-area" points="${points}" fill="${color}" data-area-id="${escapeHtml(area.id || '')}" title="${escapeHtml(area.name || area.id || '')}"/>`;
   }).join('');
 }
 
