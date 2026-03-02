@@ -4867,9 +4867,6 @@
         if (!mapSvgEl || !e.touches.length) return;
         mapDragStart = { x: e.touches[0].clientX, y: e.touches[0].clientY, panX: mapPanX, panY: mapPanY };
         mapContainerEl.classList.add('map-dragging');
-        // #region agent log
-        fetch('http://127.0.0.1:7937/ingest/41790ea1-70b3-4752-9149-93ec999e13a7',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'3d4c80'},body:JSON.stringify({sessionId:'3d4c80',location:'index.html:mapContainer touchstart',message:'mapDragStart set',data:{hasTouches:!!e.touches.length},timestamp:Date.now(),hypothesisId:'H1'})}).catch(()=>{});
-        // #endregion
       }, { passive: true });
       document.addEventListener('mousemove', (e) => {
         if (!mapDragStart) return;
@@ -4880,21 +4877,13 @@
         if (!e.touches.length) return;
         const dropdownEl = document.getElementById('mapPoiDropdown');
         const touchInDropdown = dropdownEl && dropdownEl.classList.contains('open') && (dropdownEl.contains(e.target) || (e.touches[0].target && dropdownEl.contains(e.touches[0].target)));
-        // #region agent log
-        fetch('http://127.0.0.1:7937/ingest/41790ea1-70b3-4752-9149-93ec999e13a7',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'3d4c80'},body:JSON.stringify({sessionId:'3d4c80',location:'index.html:document touchmove',message:'touchmove',data:{mapDragStartSet:!!mapDragStart,touchInDropdown,targetTag:(e.touches[0].target&&e.touches[0].target.tagName)},timestamp:Date.now(),hypothesisId:'H1'})}).catch(()=>{});
-        // #endregion
         if (touchInDropdown) return;
         if (!mapDragStart) return;
         e.preventDefault();
         applyPan(e.touches[0].clientX, e.touches[0].clientY);
       }, { passive: false });
       document.addEventListener('mouseup', endDrag);
-      document.addEventListener('touchend', (e) => {
-        // #region agent log
-        fetch('http://127.0.0.1:7937/ingest/41790ea1-70b3-4752-9149-93ec999e13a7',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'3d4c80'},body:JSON.stringify({sessionId:'3d4c80',location:'index.html:touchend',message:'endDrag',data:{hadDragStart:!!mapDragStart},timestamp:Date.now(),hypothesisId:'H1'})}).catch(()=>{});
-        // #endregion
-        endDrag();
-      });
+      document.addEventListener('touchend', endDrag);
       document.addEventListener('touchcancel', endDrag);
     }
 
