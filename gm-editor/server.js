@@ -460,7 +460,7 @@ const server = http.createServer(async (req, res) => {
 				});
 				res.end(
 					JSON.stringify({
-						title: "三连城",
+						title: "三联城",
 						subtitle: "",
 						areas: [],
 						pois: {

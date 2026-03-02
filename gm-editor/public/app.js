@@ -2270,7 +2270,10 @@ async function openMapEditor() {
 			事件: [],
 			人物: [],
 		};
-		const pois = data?.pois && typeof data.pois === "object" ? data.pois : defaultPois;
+		const pois =
+			data?.pois && typeof data.pois === "object"
+				? data.pois
+				: defaultPois;
 		const markers = [];
 		POI_TYPES.forEach((type) => {
 			(pois[type] || []).forEach((m) => {
@@ -2285,14 +2288,14 @@ async function openMapEditor() {
 			});
 		});
 		mapEditorData = {
-			title: data?.title || "三连城",
+			title: data?.title || "三联城",
 			subtitle: data?.subtitle != null ? data.subtitle : "",
 			areas: Array.isArray(data?.areas) ? data.areas : [],
 			markers,
 		};
 	} catch (_) {
 		mapEditorData = {
-			title: "三连城",
+			title: "三联城",
 			subtitle: "",
 			areas: [],
 			markers: [],
